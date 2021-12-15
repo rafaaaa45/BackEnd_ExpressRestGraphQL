@@ -4,4 +4,4 @@ const LocationSchema = mongoose.Schema({
   nome: String,
 });
 
-module.exports = mongoose.Model("Localizacao".LocationSchema);
+module.exports = mongoose.Model("Localizacoes", LocationSchema);
