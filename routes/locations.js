@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
+const Location = require("../models/Location");
 
-router.get("/localizacoes", (req, res) => {
+router.get("/", (req, res) => {
   res.send("Aqui serão as localizações");
 });
 

@@ -7,4 +7,4 @@ const LocationSchema = mongoose.Schema({
   },
 });
 
-module.exports = mongoose.Model("Localizacoes", LocationSchema);
+module.exports = mongoose.model("Localizacoes", LocationSchema);
