@@ -1,7 +1,10 @@
 const mongoose = require("mongoose");
 
 const TagSchema = mongoose.Schema({
-  tag: String,
+  nome: {
+    type: String,
+    required: true,
+  },
 });
 
 module.exports = mongoose.Model("Tags", TagSchema);

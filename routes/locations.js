@@ -1,3 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const Post = require("../models/Location.js");
+
+router.get("/localizacoes", (req, res) => {
+  res.send("Aqui serão as localizações");
+});
+
+module.exports = router;
