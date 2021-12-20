@@ -5,6 +5,7 @@ require("dotenv").config();
 const bodyParser = require("body-parser");
 const port = 3000;
 
+//middleware to parse the body
 app.use(bodyParser.json());
 
 app.get("/", (req, res) => {
@@ -12,9 +13,11 @@ app.get("/", (req, res) => {
 });
 
 //Import Routes
+const utilizadorRoutes = require("./routes/utilizadores");
 const locationRoutes = require("./routes/locations");
 const tagRoutes = require("./routes/tags");
 
+app.use("/utilizador", utilizadorRoutes);
 app.use("/locations", locationRoutes);
 app.use("/tags", tagRoutes);
 
