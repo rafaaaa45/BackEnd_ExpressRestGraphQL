@@ -1,12 +1,16 @@
 const express = require("express");
 const app = express();
-const mongoose = require("mongoose");
 require("dotenv").config();
 const bodyParser = require("body-parser");
-const port = 3000;
+const cors = require("cors");
+
+//conexão bdd
+require("./middleware/mongoDatabase").connect();
 
 //middleware to parse the body
 app.use(bodyParser.json());
+//permitir o cors
+app.use(cors({ credentials: true, origin: true }));
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
@@ -17,16 +21,11 @@ const utilizadorRoutes = require("./routes/utilizadores");
 const locationRoutes = require("./routes/locations");
 const tagRoutes = require("./routes/tags");
 
-app.use("/utilizador", utilizadorRoutes);
-app.use("/locations", locationRoutes);
-app.use("/tags", tagRoutes);
-
-//Conexão ao Mongo DB
-mongoose.connect(process.env.DB_CONNECTION, { useNewUrlParser: true }, () =>
-  console.log("Conectado ao MongoDB")
-);
+app.use("/api/utilizador", utilizadorRoutes);
+app.use("/api/locations", locationRoutes);
+app.use("/api/tags", tagRoutes);
 
 //Iniciar o Servidor
-app.listen(port, () => {
+app.listen(process.env.PORT, () => {
   console.log(`App Ligada em http://localhost:${process.env.PORT}`);
 });
