@@ -1,8 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const Tag = require("../models/Tags");
+const utils = require("../utils/utils");
+const auth = require("../middleware/auth");
 
-router.get("/", async (req, res) => {
+router.get("/", auth.verifyToken, auth.verifyRole("any"), async (req, res) => {
   try {
     const tags = await Tag.find();
     res.json(tags);

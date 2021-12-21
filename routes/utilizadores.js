@@ -2,41 +2,47 @@ const express = require("express");
 const router = express.Router();
 const Utilizador = require("../models/Utilizador");
 const utils = require("../utils/utils");
+const auth = require("../middleware/auth");
+
 //endpoint de login
 
 //endpoint criar user
-router.post("/createUtilizador", async (req, res) => {
-  let email = req.body.email;
-  let tipo = "admin";
+router.post(
+  "/createUtilizador",
+  auth.verifyToken,
+  auth.verifyRole([utils.Tipos.ADMIN]),
+  async (req, res) => {
+    const { email, tipo } = req.body;
 
-  //encriptar User PW
-  let hashedPassword = utils.encryptSha512(req.body.password);
+    //encriptar User PW
+    let hashedPassword = utils.encryptSha512(req.body.password);
 
-  const newUtilizador = new Utilizador({
-    email: email,
-    password: hashedPassword,
-    tipo: tipo,
-  });
+    const newUtilizador = new Utilizador({
+      email: email,
+      password: hashedPassword,
+      tipo: tipo,
+    });
 
-  try {
-    const createdUtilizador = await newUtilizador.save();
+    try {
+      const createdUtilizador = await newUtilizador.save();
 
-    //jwt tokens(criar aqui para ter acesso ao id)
-    createdUtilizador.token = utils.createJWT(
-      createdUtilizador._id,
-      email,
-      tipo
-    );
+      //jwt tokens(criar aqui para ter acesso ao id)
+      createdUtilizador.token = utils.createJWT(
+        createdUtilizador._id,
+        email,
+        tipo
+      );
 
-    res.json(createdUtilizador);
-  } catch (err) {
-    if (err.code === 11000) {
-      res.json("Insira um email válido, esse email já foi usado!");
-    } else {
-      res.json(err);
+      res.json(createdUtilizador);
+    } catch (err) {
+      if (err.code === 11000) {
+        res.json("Insira um email válido, esse email já foi usado!");
+      } else {
+        res.json(err);
+      }
     }
   }
-});
+);
 
 router.post("/login", async (req, res) => {
   try {
@@ -55,8 +61,9 @@ router.post("/login", async (req, res) => {
       // save user token
       user.token = token;
 
+      const updatedUser = await user.save();
       // user
-      res.json(user);
+      res.json(updatedUser);
     } else {
       res.send("Email ou Password incorreta!");
     }

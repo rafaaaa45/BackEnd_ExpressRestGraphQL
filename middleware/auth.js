@@ -22,8 +22,8 @@ const verifyToken = (req, res, next) => {
 
 const verifyRole = (roles) => {
   return (req, res, next) => {
-    if (!roles.includes(req.user.tipo)) {
-      res.send("Não tem Permissão!");
+    if (!roles.includes(req.user.tipo) && roles !== "any") {
+      return res.send("Não tem Permissão!");
     }
     next();
   };

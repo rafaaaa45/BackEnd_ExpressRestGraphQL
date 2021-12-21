@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const Location = require("../models/Location");
+const utils = require("../utils/utils");
+const auth = require("../middleware/auth");
 
 router.get("/", async (req, res) => {
   try {
