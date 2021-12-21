@@ -3,6 +3,8 @@ const app = express();
 require("dotenv").config();
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const auth = require("./middleware/auth");
+const utils = require("./utils/utils");
 
 //conexão bdd
 require("./middleware/mongoDatabase").connect();
@@ -12,9 +14,15 @@ app.use(bodyParser.json());
 //permitir o cors
 app.use(cors({ credentials: true, origin: true }));
 
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
+//sample endpoint
+app.get(
+  "/",
+  auth.verifyToken,
+  auth.verifyRole([utils.Tipos.ADMIN, utils.Tipos.EDIT]),
+  (req, res) => {
+    res.send("Hello World!");
+  }
+);
 
 //Import Routes
 const utilizadorRoutes = require("./routes/utilizadores");
