@@ -15,10 +15,15 @@ const OfficesSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  worker: {
-    type: String,
-    required: true,
-  },
+  worker: [
+    {
+      totalyearlycompensation: Number,
+      monthlysalary: Number,
+      yearsofexperience: Number,
+      yearsatcompany: Number,
+      tag_id: String,
+    },
+  ],
 });
 
 module.exports = mongoose.model("OfficesSchema", OfficesSchema);
