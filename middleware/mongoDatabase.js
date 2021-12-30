@@ -8,7 +8,7 @@ exports.connect = () => {
       useNewUrlParser: true,
     })
     .then(() => {
-      console.log("Conectado na base de Dados");
+      console.log("Conectado na base de Dados MongoDB");
     })
     .catch((error) => {
       console.log("database connection failed. exiting now...");

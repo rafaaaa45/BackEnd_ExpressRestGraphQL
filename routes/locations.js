@@ -25,4 +25,5 @@ router.post("/createLocation", async (req, res) => {
     res.json(err);
   }
 });
+
 module.exports = router;

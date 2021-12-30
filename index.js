@@ -11,6 +11,7 @@ require("./middleware/mongoDatabase").connect();
 
 //middleware to parse the body
 app.use(bodyParser.json());
+
 //permitir o cors
 app.use(cors({ credentials: true, origin: true }));
 

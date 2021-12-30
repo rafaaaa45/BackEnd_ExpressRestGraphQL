@@ -23,6 +23,10 @@ router.post(
       tipo: tipo,
     });
 
+    if (utils.isValidTipo(tipo) === false) {
+      return res.send("Insira um tipo Válido ( user | edit | admin )!");
+    }
+
     try {
       const createdUtilizador = await newUtilizador.save();
 

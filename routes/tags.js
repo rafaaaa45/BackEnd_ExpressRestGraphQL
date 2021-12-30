@@ -13,17 +13,32 @@ router.get("/", auth.verifyToken, auth.verifyRole("any"), async (req, res) => {
   }
 });
 
-router.post("/createTag", async (req, res) => {
-  const tag = new Tag({
-    tag: req.body.tag,
-  });
+router.post(
+  "/createTag",
+  auth.verifyToken,
+  auth.verifyRole(["admin", "edit"]),
+  async (req, res) => {
+    const tag = new Tag({
+      tag: req.body.tag,
+    });
 
-  try {
-    const createdTag = await tag.save();
-    res.json(createdTag);
-  } catch (err) {
-    res.json(err);
+    try {
+      const createdTag = await tag.save();
+      res.json(createdTag);
+    } catch (err) {
+      res.json(err);
+    }
   }
-});
+);
+
+router.get(
+  "/updateTag",
+  auth.verifyToken,
+  auth.verifyRole(["admin", "edit"]),
+  async (req, res) => {
+    console.log(req.user);
+    res.json("hi");
+  }
+);
 
 module.exports = router;
