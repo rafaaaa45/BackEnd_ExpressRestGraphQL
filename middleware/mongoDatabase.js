@@ -12,7 +12,7 @@ exports.connect = () => {
     })
     .catch((error) => {
       console.log("database connection failed. exiting now...");
-      throw e;
+      throw error;
     })
     .finally(() => {
       return;

@@ -28,4 +28,4 @@ const UtilizadorSchema = mongoose.Schema({
 // edit (vizualiza e edita)
 // admin (crud todo, inclusive crud de users)
 
-module.exports = mongoose.model("Utilizador", UtilizadorSchema);
+module.exports = mongoose.model("utilizadores", UtilizadorSchema);
