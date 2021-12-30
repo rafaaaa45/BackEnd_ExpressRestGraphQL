@@ -1,4 +1,3 @@
-const req = require("express/lib/request");
 const jwt = require("jsonwebtoken");
 
 const config = process.env;
@@ -13,7 +12,6 @@ const verifyToken = (req, res, next) => {
   try {
     const decodedToken = jwt.verify(token, config.TOKEN_KEY);
     req.user = decodedToken;
-    console.log(req.user);
   } catch (err) {
     return res.send("Token Inválido!");
   }
@@ -25,7 +23,7 @@ const verifyRole = (roles) => {
     if (!roles.includes(req.user.tipo) && roles !== "any") {
       return res.send("Não tem Permissão!");
     }
-    next();
+    return next();
   };
 };
 

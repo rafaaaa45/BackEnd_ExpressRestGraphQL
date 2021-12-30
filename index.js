@@ -6,7 +6,7 @@ const cors = require("cors");
 const auth = require("./middleware/auth");
 const utils = require("./utils/utils");
 
-//conexão bdd
+//conexão bdd mongodb
 require("./middleware/mongoDatabase").connect();
 
 //middleware to parse the body

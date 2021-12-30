@@ -70,7 +70,10 @@ router.post("/login", async (req, res) => {
   } catch (err) {
     console.log(err);
   }
-  // Our register logic ends here
+});
+
+router.put("/logout", auth.verifyToken, function (req, res) {
+  console.log(req.user);
 });
 
 module.exports = router;
