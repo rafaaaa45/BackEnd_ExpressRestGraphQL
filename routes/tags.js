@@ -31,13 +31,35 @@ router.post(
   }
 );
 
-router.get(
+router.put(
   "/updateTag",
   auth.verifyToken,
   auth.verifyRole(["admin", "edit"]),
   async (req, res) => {
-    console.log(req.user);
-    res.json("hi");
+    const id = req.query.id;
+
+    const tagUpdated = {
+      tag: req.body.tag,
+    };
+
+    Tag.findOneAndUpdate(
+      { _id: id },
+      {
+        $set: tagUpdated,
+      },
+      {
+        //Caso não exista id insere
+        upsert: true,
+      }
+    )
+      .then((result) => {
+        console.log(result);
+        res.json("Tag atualizada");
+      })
+      .catch((error) => {
+        console.error(error);
+        res.json("Ocorreu um erro");
+      });
   }
 );
 
