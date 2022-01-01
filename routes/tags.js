@@ -53,12 +53,37 @@ router.put(
       }
     )
       .then((result) => {
-        console.log(result);
-        res.json("Tag atualizada");
+        if (result) {
+          res.json({ isSuccess: true, data: result });
+        } else {
+          res.json({ isSuccess: false, data: "ID não existe" });
+        }
       })
       .catch((error) => {
         console.error(error);
-        res.json("Ocorreu um erro");
+        res.json({ isSuccess: false, data: "Ocorreu um erro" });
+      });
+  }
+);
+
+router.delete(
+  "/deleteTag",
+  auth.verifyToken,
+  auth.verifyRole(["admin", "edit"]),
+  async (req, res) => {
+    const id = req.query.id;
+
+    Tag.deleteOne({ _id: id })
+      .then((result) => {
+        if (result) {
+          res.json({ isSuccess: true, data: result });
+        } else {
+          res.json({ isSuccess: false, data: "ID não existe" });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        res.json({ isSuccess: false, data: "Ocorreu um erro" });
       });
   }
 );
