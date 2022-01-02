@@ -5,11 +5,24 @@ const utils = require("../utils/utils");
 const auth = require("../middleware/auth");
 
 router.get("/", auth.verifyToken, auth.verifyRole("any"), async (req, res) => {
-  try {
-    const tags = await Tag.find();
-    res.json(tags);
-  } catch (err) {
-    res.json({ message: err });
+  const id = req.query.id;
+
+  if (id) {
+    await Tag.findOne({ id })
+      .then((result) => {
+        res.json({ isSuccess: true, data: result });
+      })
+      .catch((err) => {
+        res.json({ isSuccess: false, data: "ID não encontrado" });
+      });
+  } else {
+    await Tag.find()
+      .then((result) => {
+        res.json({ isSuccess: true, data: result });
+      })
+      .catch((err) => {
+        res.json({ isSuccess: false, data: "Ocorreu um erro" });
+      });
   }
 });
 
