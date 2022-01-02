@@ -28,10 +28,12 @@ app.get(
 //Import Routes
 const utilizadorRoutes = require("./routes/utilizadores");
 const locationRoutes = require("./routes/locations");
+const companieRoutes = require("./routes/companies");
 const tagRoutes = require("./routes/tags");
 
 app.use("/api/utilizador", utilizadorRoutes);
 app.use("/api/locations", locationRoutes);
+app.use("/api/companies", companieRoutes);
 app.use("/api/tags", tagRoutes);
 
 //Iniciar o Servidor

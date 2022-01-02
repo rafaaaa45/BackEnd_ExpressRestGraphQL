@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Location = require("../models/Location");
+const Companie = require("../models/Companies");
 const utils = require("../utils/utils");
 const auth = require("../middleware/auth");
 
@@ -8,7 +8,7 @@ router.get("/", auth.verifyToken, auth.verifyRole("any"), async (req, res) => {
   const id = req.query.id;
 
   if (id) {
-    await Location.findOne({ id })
+    await Companie.findOne({ id })
       .then((result) => {
         res.json({ isSuccess: true, data: result });
       })
@@ -16,7 +16,7 @@ router.get("/", auth.verifyToken, auth.verifyRole("any"), async (req, res) => {
         res.json({ isSuccess: false, data: "ID não encontrado" });
       });
   } else {
-    await Location.find()
+    await Companie.find()
       .then((result) => {
         res.json({ isSuccess: true, data: result });
       })
@@ -27,17 +27,17 @@ router.get("/", auth.verifyToken, auth.verifyRole("any"), async (req, res) => {
 });
 
 router.post(
-  "/createLocation",
+  "/createCompanie",
   auth.verifyToken,
   auth.verifyRole(["admin", "edit"]),
   async (req, res) => {
-    const location = new Location({
-      location: req.body.location,
+    const companie = new Companie({
+      companie: req.body.companie,
     });
 
     try {
-      const createdLocation = await location.save();
-      res.json(createdLocation);
+      const createdCompanie = await companie.save();
+      res.json(createdCompanie);
     } catch (err) {
       res.json(err);
     }
@@ -45,20 +45,20 @@ router.post(
 );
 
 router.put(
-  "/updateLocation",
+  "/updateCompanie",
   auth.verifyToken,
   auth.verifyRole(["admin", "edit"]),
   async (req, res) => {
     const id = req.query.id;
 
-    const locationUpdated = {
-      location: req.body.location,
+    const companieUpdated = {
+      companie: req.body.companie,
     };
 
-    Location.findOneAndUpdate(
+    Companie.findOneAndUpdate(
       { _id: id },
       {
-        $set: locationUpdated,
+        $set: companieUpdated,
       },
       {
         //Caso não exista id insere
@@ -80,13 +80,13 @@ router.put(
 );
 
 router.delete(
-  "/deleteLocation",
+  "/deleteCompanie",
   auth.verifyToken,
   auth.verifyRole(["admin", "edit"]),
   async (req, res) => {
     const id = req.query.id;
 
-    Location.deleteOne({ _id: id })
+    Companie.deleteOne({ _id: id })
       .then((result) => {
         if (result) {
           res.json({ isSuccess: true, data: result });
