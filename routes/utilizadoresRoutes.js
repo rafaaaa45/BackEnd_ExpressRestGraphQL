@@ -42,7 +42,8 @@ router.post(
       if (err.code === 11000) {
         res.json("Insira um email válido, esse email já foi usado!");
       } else {
-        res.json(err);
+        console.log(err);
+        res.json({ isSuccess: false, data: "Ocorreu um erro" });
       }
     }
   }

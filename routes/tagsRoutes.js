@@ -37,9 +37,10 @@ router.post(
 
     try {
       const createdTag = await tag.save();
-      res.json(createdTag);
+      res.json({ isSuccess: true, data: createdTag });
     } catch (err) {
-      res.json(err);
+      console.log(err);
+      res.json({ isSuccess: false, data: "Ocorreu um erro" });
     }
   }
 );

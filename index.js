@@ -30,10 +30,12 @@ const utilizadorRoutes = require("./routes/utilizadoresRoutes");
 const locationRoutes = require("./routes/locationsRoutes");
 const companieRoutes = require("./routes/companiesRoutes");
 const tagRoutes = require("./routes/tagsRoutes");
+const officeRoutes = require("./routes/officesRoutes");
 
 app.use("/api/utilizador", utilizadorRoutes);
 app.use("/api/locations", locationRoutes);
 app.use("/api/companies", companieRoutes);
+app.use("/api/offices", officeRoutes);
 app.use("/api/tags", tagRoutes);
 
 //Iniciar o Servidor

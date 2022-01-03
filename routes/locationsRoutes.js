@@ -37,9 +37,10 @@ router.post(
 
     try {
       const createdLocation = await location.save();
-      res.json(createdLocation);
+      res.json({ isSuccess: true, data: createdLocation });
     } catch (err) {
-      res.json(err);
+      console.log(err);
+      res.json({ isSuccess: false, data: "Ocorreu um erro" });
     }
   }
 );
