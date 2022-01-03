@@ -31,13 +31,9 @@ router.post(
   auth.verifyToken,
   auth.verifyRole(["admin", "edit"]),
   async (req, res) => {
-    const companie = new Companie({
-      companie: req.body.companie,
-    });
-
     try {
-      const createdCompanie = await companie.save();
-      res.json({ isSuccess: true, data: createdCompanie });
+      const company = await utils.getCompanie(req.body.companie);
+      res.json({ isSuccess: true, data: company });
     } catch (err) {
       console.log(err);
       res.json({ isSuccess: false, data: "Ocorreu um erro" });
@@ -56,7 +52,7 @@ router.put(
       companie: req.body.companie,
     };
 
-    Companie.findOneAndUpdate(
+    await Companie.findOneAndUpdate(
       { _id: id },
       {
         $set: companieUpdated,
@@ -87,7 +83,7 @@ router.delete(
   async (req, res) => {
     const id = req.query.id;
 
-    Companie.deleteOne({ _id: id })
+    await Companie.deleteOne({ _id: id })
       .then((result) => {
         if (result) {
           res.json({ isSuccess: true, data: result });

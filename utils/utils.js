@@ -38,7 +38,6 @@ const getLocation = async (location) => {
     })
     .catch((err) => {
       console.log(err);
-      res.json({ isSuccess: false, data: "Ocorreu um erro" });
     });
 
   return loc;
@@ -61,7 +60,6 @@ const getCompanie = async (companie) => {
     })
     .catch((err) => {
       console.log(err);
-      res.json({ isSuccess: false, data: "Ocorreu um erro" });
     });
 
   return com;
@@ -84,7 +82,6 @@ const getTag = async (tag) => {
     })
     .catch((err) => {
       console.log(err);
-      res.json({ isSuccess: false, data: "Ocorreu um erro" });
     });
 
   return t;

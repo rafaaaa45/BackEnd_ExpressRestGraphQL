@@ -119,7 +119,7 @@ router.put(
       "worker.$.tag_id": tag_id,
     };
 
-    Office.update(
+    await Office.update(
       { _id: idTag, "worker._id": idWorker },
       {
         $set: worker,
@@ -172,7 +172,7 @@ router.put(
         res.json({ isSuccess: false, data: "Ocorreu um erro" });
       });
 
-    Office.findOneAndUpdate(
+    await Office.findOneAndUpdate(
       { _id: id },
       {
         $set: officeUpdated,
@@ -203,7 +203,7 @@ router.delete(
   async (req, res) => {
     const id = req.query.id;
 
-    Office.deleteOne({ _id: id })
+    await Office.deleteOne({ _id: id })
       .then((result) => {
         if (result) {
           res.json({ isSuccess: true, data: result });

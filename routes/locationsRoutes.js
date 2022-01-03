@@ -31,13 +31,9 @@ router.post(
   auth.verifyToken,
   auth.verifyRole(["admin", "edit"]),
   async (req, res) => {
-    const location = new Location({
-      location: req.body.location,
-    });
-
     try {
-      const createdLocation = await location.save();
-      res.json({ isSuccess: true, data: createdLocation });
+      const location = await utils.getLocation(req.body.location);
+      res.json({ isSuccess: true, data: location });
     } catch (err) {
       console.log(err);
       res.json({ isSuccess: false, data: "Ocorreu um erro" });
@@ -56,7 +52,7 @@ router.put(
       location: req.body.location,
     };
 
-    Location.findOneAndUpdate(
+    await Location.findOneAndUpdate(
       { _id: id },
       {
         $set: locationUpdated,
@@ -87,7 +83,7 @@ router.delete(
   async (req, res) => {
     const id = req.query.id;
 
-    Location.deleteOne({ _id: id })
+    await Location.deleteOne({ _id: id })
       .then((result) => {
         if (result) {
           res.json({ isSuccess: true, data: result });

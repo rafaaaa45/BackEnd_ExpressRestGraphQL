@@ -31,13 +31,9 @@ router.post(
   auth.verifyToken,
   auth.verifyRole(["admin", "edit"]),
   async (req, res) => {
-    const tag = new Tag({
-      tag: req.body.tag,
-    });
-
     try {
-      const createdTag = await tag.save();
-      res.json({ isSuccess: true, data: createdTag });
+      const tag = await utils.getTag(req.body.tag);
+      res.json({ isSuccess: true, data: tag });
     } catch (err) {
       console.log(err);
       res.json({ isSuccess: false, data: "Ocorreu um erro" });
@@ -56,7 +52,7 @@ router.put(
       tag: req.body.tag,
     };
 
-    Tag.findOneAndUpdate(
+    await Tag.findOneAndUpdate(
       { _id: id },
       {
         $set: tagUpdated,
@@ -87,7 +83,7 @@ router.delete(
   async (req, res) => {
     const id = req.query.id;
 
-    Tag.deleteOne({ _id: id })
+    await Tag.deleteOne({ _id: id })
       .then((result) => {
         if (result) {
           res.json({ isSuccess: true, data: result });
