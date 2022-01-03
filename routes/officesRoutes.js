@@ -67,6 +67,38 @@ router.post(
 );
 
 router.put(
+  "/createWorker",
+  auth.verifyToken,
+  auth.verifyRole(["admin", "edit"]),
+  async (req, res) => {
+    const id = req.query.id;
+
+    const tag = await utils.getTag(req.body.tag);
+    const tag_id = tag._id;
+
+    const worker = {
+      totalyearlycompensation: req.body.totalyearlycompensation,
+      monthlysalary: req.body.monthlysalary,
+      yearsofexperience: req.body.yearsofexperience,
+      yearsatcompany: req.body.yearsatcompany,
+      tag_id: tag_id,
+    };
+
+    let office = await Office.findOne({ id });
+    office.worker.push(worker);
+    office
+      .save()
+      .then((result) => {
+        res.json({ isSuccess: true, data: result });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.json({ isSuccess: false, data: "Ocorreu um erro" });
+      });
+  }
+);
+
+router.put(
   "/updateOffice",
   auth.verifyToken,
   auth.verifyRole(["admin", "edit"]),

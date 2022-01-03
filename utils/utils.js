@@ -2,6 +2,7 @@ const crypto = require("crypto");
 const res = require("express/lib/response");
 const Office = require("../models/Offices");
 const Location = require("../models/Location");
+const Tag = require("../models/Tags");
 const Companie = require("../models/Companies");
 const jwt = require("jsonwebtoken");
 const { nextTick } = require("process");
@@ -66,6 +67,29 @@ const getCompanie = async (companie) => {
   return com;
 };
 
+const getTag = async (tag) => {
+  let t;
+
+  await Tag.findOne({ tag })
+    .then((result) => {
+      if (result) {
+        t = result;
+      } else {
+        //cria o novo objeto de Location caso não exista
+        t = new Tag({
+          tag: tag,
+        });
+        t.save();
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      res.json({ isSuccess: false, data: "Ocorreu um erro" });
+    });
+
+  return t;
+};
+
 const createJWT = (id, email, tipo) => {
   let newToken;
 
@@ -91,5 +115,6 @@ exports.encryptSha512 = encryptSha512;
 exports.createJWT = createJWT;
 exports.getCompanie = getCompanie;
 exports.getLocation = getLocation;
+exports.getTag = getTag;
 exports.Tipos = Tipos;
 exports.isValidTipo = isValidTipo;
