@@ -99,6 +99,47 @@ router.put(
 );
 
 router.put(
+  "/updateWorker",
+  auth.verifyToken,
+  auth.verifyRole(["admin", "edit"]),
+  async (req, res) => {
+    const idWorker = req.query.idWorker;
+    const idTag = req.query.idTag;
+    console.log(idTag);
+    console.log(idWorker);
+
+    const tag = await utils.getTag(req.body.tag);
+    const tag_id = tag._id;
+
+    const worker = {
+      "worker.$.totalyearlycompensation": req.body.totalyearlycompensation,
+      "worker.$.monthlysalary": req.body.monthlysalary,
+      "worker.$.yearsofexperience": req.body.yearsofexperience,
+      "worker.$.yearsatcompany": req.body.yearsatcompany,
+      "worker.$.tag_id": tag_id,
+    };
+
+    Office.update(
+      { _id: idTag, "worker._id": idWorker },
+      {
+        $set: worker,
+      }
+    )
+      .then((result) => {
+        if (result) {
+          res.json({ isSuccess: true, data: result });
+        } else {
+          res.json({ isSuccess: false, data: "ID não existe" });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        res.json({ isSuccess: false, data: "Ocorreu um erro" });
+      });
+  }
+);
+
+router.put(
   "/updateOffice",
   auth.verifyToken,
   auth.verifyRole(["admin", "edit"]),
