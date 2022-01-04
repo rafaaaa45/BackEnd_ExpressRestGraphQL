@@ -40,9 +40,11 @@ router.post(
       {
         $set: tag,
       },
+
       {
         //Caso não exista insere novo
         upsert: true,
+        runValidators: true,
       }
     )
       .then((result) => {
@@ -53,8 +55,8 @@ router.post(
         }
       })
       .catch((error) => {
-        console.error(error);
-        res.json({ isSuccess: false, data: "Ocorreu um erro" });
+        let data = error.message;
+        res.json({ isSuccess: false, data });
       });
   }
 );
@@ -65,19 +67,22 @@ router.put(
   auth.verifyAdmin_Edit,
   async (req, res) => {
     const id = req.query.id;
+    const newTagName = req.body.tag;
 
-    const tagUpdated = {
-      tag: req.body.tag,
+    const TagUpdate = {
+      _id: id,
+      tag: newTagName,
     };
 
     await Tag.findOneAndUpdate(
       { _id: id },
       {
-        $set: tagUpdated,
+        $set: TagUpdate,
       },
       {
         //Caso não exista id insere
         upsert: true,
+        runValidators: true,
       }
     )
       .then((result) => {
@@ -88,8 +93,8 @@ router.put(
         }
       })
       .catch((error) => {
-        console.error(error);
-        res.json({ isSuccess: false, data: "Ocorreu um erro" });
+        let data = error.message;
+        res.json({ isSuccess: false, data });
       });
   }
 );

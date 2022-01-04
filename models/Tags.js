@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 //guid, ids gerado
+const { UUIDv4 } = require("uuid-v4-validator");
 const { v4: uuidv4 } = require("uuid");
 
 const TagSchema = mongoose.Schema({
@@ -7,20 +8,18 @@ const TagSchema = mongoose.Schema({
     type: String,
     default: uuidv4,
     validate: {
-      validator: (value) => {
-        //incompleto pesquisar sobre validator guid
-        if (value) {
-          return false;
-        }
+      isAsync: true,
+      validator: function (value) {
+        return UUIDv4.validate(value);
       },
-      message: (props) => {
-        return `${props.value} is not a valid QUID`;
+      message: function (props) {
+        return `${props.value} is not a valid GUID`;
       },
     },
   },
   tag: {
     type: String,
-    required: true,
+    required: [true, "É obrigatório inserir nome da Tag"],
   },
 });
 

@@ -6,6 +6,7 @@ const Companie = require("../models/Companies");
 const utils = require("../utils/utils");
 const auth = require("../middleware/auth");
 
+//done
 router.get("/", auth.verifyToken, auth.verifyAny, async (req, res) => {
   const id = req.query.id;
 
@@ -28,6 +29,7 @@ router.get("/", auth.verifyToken, auth.verifyAny, async (req, res) => {
   }
 });
 
+//done
 router.post(
   "/createOffice",
   auth.verifyToken,
@@ -35,9 +37,12 @@ router.post(
   async (req, res) => {
     const locationId = req.body.location;
     const companyId = req.body.companie;
+    const workers = req.body.workers;
+
     const office = {
       locationId: locationId,
       companyId: companyId,
+      worker: workers,
     };
 
     await Office.findOneAndUpdate(
@@ -48,6 +53,7 @@ router.post(
       {
         //Caso não exista insere novo
         upsert: true,
+        runValidators: true,
       }
     )
       .then((result) => {
@@ -58,41 +64,65 @@ router.post(
         }
       })
       .catch((error) => {
-        console.error(error);
-        res.json({ isSuccess: false, data: "Ocorreu um erro" });
+        let data = error.message;
+        res.json({ isSuccess: false, data });
       });
   }
 );
 
+//rever
 router.put(
-  "/createWorker",
+  "/addWorker",
   auth.verifyToken,
   auth.verifyAdmin_Edit,
   async (req, res) => {
     const id = req.query.id;
+    const {
+      totalyearlycompensation,
+      monthlysalary,
+      yearsofexperience,
+      yearsatcompany,
+      tag,
+    } = req.body;
 
     const worker = {
-      totalyearlycompensation: req.body.totalyearlycompensation,
-      monthlysalary: req.body.monthlysalary,
-      yearsofexperience: req.body.yearsofexperience,
-      yearsatcompany: req.body.yearsatcompany,
-      tag_id: req.body.tag,
+      totalyearlycompensation: totalyearlycompensation || null,
+      monthlysalary: monthlysalary || null,
+      yearsofexperience: yearsofexperience || null,
+      yearsatcompany: yearsatcompany || null,
+      tag_id: tag || null,
     };
 
+    //se enviar o worker a null enviar erro
+    if (
+      !totalyearlycompensation &&
+      !monthlysalary &&
+      !yearsofexperience &&
+      !tag
+    ) {
+      return res.json({
+        isSuccess: false,
+        data: "Necessita de Adicionar os dados do Worker",
+      });
+    }
+
     let office = await Office.findOne({ id });
+    console.log(office);
+
     office.worker.push(worker);
     office
       .save()
       .then((result) => {
         res.json({ isSuccess: true, data: result });
       })
-      .catch((err) => {
-        console.log(err);
-        res.json({ isSuccess: false, data: "Ocorreu um erro" });
+      .catch((error) => {
+        let data = error.message;
+        res.json({ isSuccess: false, data });
       });
   }
 );
 
+//rever
 router.put(
   "/updateWorker",
   auth.verifyToken,
@@ -109,7 +139,7 @@ router.put(
       "worker.$.tag_id": req.body.tag,
     };
 
-    await Office.update(
+    await Office.updateOne(
       { _id: idOffice, "worker._id": idWorker },
       {
         $set: worker,
@@ -123,12 +153,13 @@ router.put(
         }
       })
       .catch((error) => {
-        console.error(error);
-        res.json({ isSuccess: false, data: "Ocorreu um erro" });
+        let data = error.message;
+        res.json({ isSuccess: false, data });
       });
   }
 );
 
+//done
 router.put(
   "/updateOffice",
   auth.verifyToken,
@@ -136,10 +167,12 @@ router.put(
   async (req, res) => {
     const id = req.query.id;
 
+    console.log(id);
     const locationId = req.body.location;
     const companyId = req.body.companie;
 
     const officeUpdated = {
+      _id: id,
       locationId: locationId,
       companyId: companyId,
     };
@@ -152,6 +185,7 @@ router.put(
       {
         //Caso não exista id insere novo
         upsert: true,
+        runValidators: true,
       }
     )
       .then((result) => {
@@ -165,8 +199,8 @@ router.put(
         }
       })
       .catch((error) => {
-        console.error(error);
-        res.json({ isSuccess: false, data: "Ocorreu um erro" });
+        let data = error.message;
+        res.json({ isSuccess: false, data });
       });
   }
 );

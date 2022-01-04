@@ -8,7 +8,7 @@ const verifyToken = (req, res, next) => {
   //   req.body.token || req.query.token || req.headers["x-access-token"];
 
   const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYzk0MjU4ZTEtOWZkYi00NDY1LTkyNWEtM2FjNjc1MDhiOWI1IiwiZW1haWwiOiJhZG1pbkBhZG1pbi5wdCIsInRpcG8iOiJhZG1pbiIsImlhdCI6MTY0MTMwNDEzNSwiZXhwIjoxNjQxMzA3NzM1fQ.8cEbsOlkkYR0VJ8lakvreqmVPo5uD7P9cPfFx0UQxDc";
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYzk0MjU4ZTEtOWZkYi00NDY1LTkyNWEtM2FjNjc1MDhiOWI1IiwiZW1haWwiOiJhZG1pbkBhZG1pbi5wdCIsInRpcG8iOiJhZG1pbiIsImlhdCI6MTY0MTMyMDYwMCwiZXhwIjoxNjQxMzI0MjAwfQ.W6HtBFNmOmgikE1nWx0y7R4Ep8r7_6DConA2C4IBS4M";
 
   if (!token) {
     return res.send("Necessita de um token para Autenticar!");

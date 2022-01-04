@@ -77,4 +77,61 @@ router.post("/login", async (req, res) => {
   }
 });
 
+router.put(
+  "/updateUser",
+  auth.verifyToken,
+  auth.verifyAdmin_Edit,
+  async (req, res) => {
+    const id = req.query.id;
+
+    const tagUpdated = {
+      tag: req.body.tag,
+    };
+
+    await Tag.findOneAndUpdate(
+      { _id: id },
+      {
+        $set: tagUpdated,
+      },
+      {
+        //Caso não exista id insere
+        upsert: true,
+      }
+    )
+      .then((result) => {
+        if (result) {
+          res.json({ isSuccess: true, data: result });
+        } else {
+          res.json({ isSuccess: false, data: "ID não existe" });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        res.json({ isSuccess: false, data: "Ocorreu um erro" });
+      });
+  }
+);
+
+router.delete(
+  "/deleteUser",
+  auth.verifyToken,
+  auth.verifyAdmin_Edit,
+  async (req, res) => {
+    const id = req.query.id;
+
+    await Tag.deleteOne({ _id: id })
+      .then((result) => {
+        if (result) {
+          res.json({ isSuccess: true, data: result });
+        } else {
+          res.json({ isSuccess: false, data: "ID não existe" });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        res.json({ isSuccess: false, data: "Ocorreu um erro" });
+      });
+  }
+);
+
 module.exports = router;

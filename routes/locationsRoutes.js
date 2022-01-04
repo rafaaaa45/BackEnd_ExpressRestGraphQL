@@ -43,6 +43,7 @@ router.post(
       {
         //Caso não exista insere novo
         upsert: true,
+        runValidators: true,
       }
     )
       .then((result) => {
@@ -53,8 +54,8 @@ router.post(
         }
       })
       .catch((error) => {
-        console.error(error);
-        res.json({ isSuccess: false, data: "Ocorreu um erro" });
+        let data = error.message;
+        res.json({ isSuccess: false, data });
       });
   }
 );
@@ -67,6 +68,7 @@ router.put(
     const id = req.query.id;
 
     const locationUpdated = {
+      _id: id,
       location: req.body.location,
     };
 
@@ -78,6 +80,7 @@ router.put(
       {
         //Caso não exista id insere
         upsert: true,
+        runValidators: true,
       }
     )
       .then((result) => {
@@ -88,8 +91,8 @@ router.put(
         }
       })
       .catch((error) => {
-        console.error(error);
-        res.json({ isSuccess: false, data: "Ocorreu um erro" });
+        let data = error.message;
+        res.json({ isSuccess: false, data });
       });
   }
 );
