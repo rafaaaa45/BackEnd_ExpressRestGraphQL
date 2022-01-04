@@ -4,7 +4,7 @@ const Tag = require("../models/Tags");
 const utils = require("../utils/utils");
 const auth = require("../middleware/auth");
 
-router.get("/", auth.verifyToken, auth.verifyRole("any"), async (req, res) => {
+router.get("/", auth.verifyToken, auth.verifyAny, async (req, res) => {
   const id = req.query.id;
 
   if (id) {
@@ -29,7 +29,7 @@ router.get("/", auth.verifyToken, auth.verifyRole("any"), async (req, res) => {
 router.post(
   "/createTag",
   auth.verifyToken,
-  auth.verifyRole(["admin", "edit"]),
+  auth.verifyAdmin_Edit,
   async (req, res) => {
     const tag = {
       tag: req.body.tag,
@@ -62,7 +62,7 @@ router.post(
 router.put(
   "/updateTag",
   auth.verifyToken,
-  auth.verifyRole(["admin", "edit"]),
+  auth.verifyAdmin_Edit,
   async (req, res) => {
     const id = req.query.id;
 
@@ -97,7 +97,7 @@ router.put(
 router.delete(
   "/deleteTag",
   auth.verifyToken,
-  auth.verifyRole(["admin", "edit"]),
+  auth.verifyAdmin_Edit,
   async (req, res) => {
     const id = req.query.id;
 

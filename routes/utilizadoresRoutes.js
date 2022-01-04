@@ -10,7 +10,7 @@ const auth = require("../middleware/auth");
 router.post(
   "/createUtilizador",
   auth.verifyToken,
-  auth.verifyRole([utils.Tipos.ADMIN]),
+  auth.verifyAdmin,
   async (req, res) => {
     const { email, tipo } = req.body;
 
@@ -75,10 +75,6 @@ router.post("/login", async (req, res) => {
   } catch (err) {
     console.log(err);
   }
-});
-
-router.put("/logout", auth.verifyToken, function (req, res) {
-  console.log(req.user);
 });
 
 module.exports = router;

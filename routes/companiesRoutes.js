@@ -1,10 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const Companie = require("../models/Companies");
-const utils = require("../utils/utils");
 const auth = require("../middleware/auth");
 
-router.get("/", auth.verifyToken, auth.verifyRole("any"), async (req, res) => {
+router.get("/", auth.verifyToken, auth.verifyAny, async (req, res) => {
   const id = req.query.id;
 
   if (id) {
@@ -29,7 +28,7 @@ router.get("/", auth.verifyToken, auth.verifyRole("any"), async (req, res) => {
 router.post(
   "/createCompanie",
   auth.verifyToken,
-  auth.verifyRole(["admin", "edit"]),
+  auth.verifyAdmin_Edit,
   async (req, res) => {
     const companie = {
       companie: req.body.companie,
@@ -62,7 +61,7 @@ router.post(
 router.put(
   "/updateCompanie",
   auth.verifyToken,
-  auth.verifyRole(["admin", "edit"]),
+  auth.verifyAdmin_Edit,
   async (req, res) => {
     const id = req.query.id;
 
@@ -97,7 +96,7 @@ router.put(
 router.delete(
   "/deleteCompanie",
   auth.verifyToken,
-  auth.verifyRole(["admin", "edit"]),
+  auth.verifyAdmin_Edit,
   async (req, res) => {
     const id = req.query.id;
 

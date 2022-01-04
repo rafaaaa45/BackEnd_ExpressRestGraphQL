@@ -15,16 +15,6 @@ app.use(bodyParser.json());
 //permitir o cors
 app.use(cors({ credentials: true, origin: true }));
 
-//sample endpoint
-app.get(
-  "/",
-  auth.verifyToken,
-  auth.verifyRole([utils.Tipos.ADMIN, utils.Tipos.EDIT]),
-  (req, res) => {
-    res.send("Hello World!");
-  }
-);
-
 //Import Routes
 const utilizadorRoutes = require("./routes/utilizadoresRoutes");
 const locationRoutes = require("./routes/locationsRoutes");

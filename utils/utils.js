@@ -1,11 +1,12 @@
 const crypto = require("crypto");
-const res = require("express/lib/response");
-const Office = require("../models/Offices");
-const Location = require("../models/Location");
-const Tag = require("../models/Tags");
-const Companie = require("../models/Companies");
+// const res = require("express/lib/response");
+// const Office = require("../models/Offices");
+// const Location = require("../models/Location");
+// const Tag = require("../models/Tags");
+// const Companie = require("../models/Companies");
+// const { nextTick } = require("process");
+
 const jwt = require("jsonwebtoken");
-const { nextTick } = require("process");
 
 const Tipos = {
   ADMIN: "admin",
@@ -110,8 +111,8 @@ const isValidTipo = (tipo) => {
 
 exports.encryptSha512 = encryptSha512;
 exports.createJWT = createJWT;
+exports.Tipos = Tipos;
+exports.isValidTipo = isValidTipo;
 /* exports.getCompanie = getCompanie;
 exports.getLocation = getLocation;
 exports.getTag = getTag; */
-exports.Tipos = Tipos;
-exports.isValidTipo = isValidTipo;

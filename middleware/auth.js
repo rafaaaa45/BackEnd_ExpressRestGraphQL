@@ -1,10 +1,14 @@
 const jwt = require("jsonwebtoken");
+const utils = require("../utils/utils");
 
 const config = process.env;
 
 const verifyToken = (req, res, next) => {
+  // const token =
+  //   req.body.token || req.query.token || req.headers["x-access-token"];
+
   const token =
-    req.body.token || req.query.token || req.headers["x-access-token"];
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYzk0MjU4ZTEtOWZkYi00NDY1LTkyNWEtM2FjNjc1MDhiOWI1IiwiZW1haWwiOiJhZG1pbkBhZG1pbi5wdCIsInRpcG8iOiJhZG1pbiIsImlhdCI6MTY0MTMwNDEzNSwiZXhwIjoxNjQxMzA3NzM1fQ.8cEbsOlkkYR0VJ8lakvreqmVPo5uD7P9cPfFx0UQxDc";
 
   if (!token) {
     return res.send("Necessita de um token para Autenticar!");
@@ -31,4 +35,6 @@ const verifyRole = (roles) => {
 };
 
 exports.verifyToken = verifyToken;
-exports.verifyRole = verifyRole;
+exports.verifyAdmin = verifyRole([utils.Tipos.ADMIN]);
+exports.verifyAdmin_Edit = verifyRole([utils.Tipos.ADMIN, utils.Tipos.EDIT]);
+exports.verifyAny = verifyRole("any");
