@@ -31,13 +31,31 @@ router.post(
   auth.verifyToken,
   auth.verifyRole(["admin", "edit"]),
   async (req, res) => {
-    try {
-      const company = await utils.getCompanie(req.body.companie);
-      res.json({ isSuccess: true, data: company });
-    } catch (err) {
-      console.log(err);
-      res.json({ isSuccess: false, data: "Ocorreu um erro" });
-    }
+    const companie = {
+      companie: req.body.companie,
+    };
+
+    await Companie.findOneAndUpdate(
+      { companie: req.body.companie },
+      {
+        $set: companie,
+      },
+      {
+        //Caso não exista insere novo
+        upsert: true,
+      }
+    )
+      .then((result) => {
+        if (result) {
+          res.json({ isSuccess: false, data: result });
+        } else {
+          res.json({ isSuccess: true, data: "Nova Companie criada" });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        res.json({ isSuccess: false, data: "Ocorreu um erro" });
+      });
   }
 );
 

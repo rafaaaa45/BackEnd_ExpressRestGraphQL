@@ -21,7 +21,7 @@ const encryptSha512 = (password) => {
   return encryptedPW;
 };
 
-const getLocation = async (location) => {
+/* const getLocation = async (location) => {
   let loc;
 
   await Location.findOne({ location })
@@ -41,9 +41,9 @@ const getLocation = async (location) => {
     });
 
   return loc;
-};
+}; */
 
-const getCompanie = async (companie) => {
+/* const getCompanie = async (companie) => {
   let com;
 
   await Companie.findOne({ companie })
@@ -63,9 +63,9 @@ const getCompanie = async (companie) => {
     });
 
   return com;
-};
+}; */
 
-const getTag = async (tag) => {
+/* const getTag = async (tag) => {
   let t;
 
   await Tag.findOne({ tag })
@@ -85,7 +85,7 @@ const getTag = async (tag) => {
     });
 
   return t;
-};
+}; */
 
 const createJWT = (id, email, tipo) => {
   let newToken;
@@ -110,8 +110,8 @@ const isValidTipo = (tipo) => {
 
 exports.encryptSha512 = encryptSha512;
 exports.createJWT = createJWT;
-exports.getCompanie = getCompanie;
+/* exports.getCompanie = getCompanie;
 exports.getLocation = getLocation;
-exports.getTag = getTag;
+exports.getTag = getTag; */
 exports.Tipos = Tipos;
 exports.isValidTipo = isValidTipo;

@@ -6,6 +6,17 @@ const TagSchema = mongoose.Schema({
   _id: {
     type: String,
     default: uuidv4,
+    validate: {
+      validator: (value) => {
+        //incompleto pesquisar sobre validator guid
+        if (value) {
+          return false;
+        }
+      },
+      message: (props) => {
+        return `${props.value} is not a valid QUID`;
+      },
+    },
   },
   tag: {
     type: String,

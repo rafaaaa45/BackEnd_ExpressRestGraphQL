@@ -33,36 +33,34 @@ router.post(
   auth.verifyToken,
   auth.verifyRole(["admin", "edit"]),
   async (req, res) => {
-    const location = await utils.getLocation(req.body.location);
-    const company = await utils.getCompanie(req.body.companie);
-    const locationId = location._id;
-    const companyId = company._id;
-    let office;
+    const locationId = req.body.location;
+    const companyId = req.body.companie;
+    const office = {
+      locationId: locationId,
+      companyId: companyId,
+    };
 
-    // Verificar se existe office com esta localização e empresa
-    await Office.findOne({ locationId, companyId })
+    await Office.findOneAndUpdate(
+      { locationId: locationId, companyId: companyId },
+      {
+        $set: office,
+      },
+      {
+        //Caso não exista insere novo
+        upsert: true,
+      }
+    )
       .then((result) => {
         if (result) {
-          office = result;
+          res.json({ isSuccess: false, data: result });
         } else {
-          office = new Office({
-            locationId: locationId,
-            companyId: companyId,
-          });
+          res.json({ isSuccess: true, data: "Novo office criado" });
         }
       })
-      .catch((err) => {
-        console.log(err);
+      .catch((error) => {
+        console.error(error);
         res.json({ isSuccess: false, data: "Ocorreu um erro" });
       });
-
-    try {
-      const createdOffice = await office.save();
-      res.json({ isSuccess: true, data: createdOffice });
-    } catch (err) {
-      console.log(err);
-      res.json({ isSuccess: false, data: "Ocorreu um erro" });
-    }
   }
 );
 
@@ -73,15 +71,12 @@ router.put(
   async (req, res) => {
     const id = req.query.id;
 
-    const tag = await utils.getTag(req.body.tag);
-    const tag_id = tag._id;
-
     const worker = {
       totalyearlycompensation: req.body.totalyearlycompensation,
       monthlysalary: req.body.monthlysalary,
       yearsofexperience: req.body.yearsofexperience,
       yearsatcompany: req.body.yearsatcompany,
-      tag_id: tag_id,
+      tag_id: req.body.tag,
     };
 
     let office = await Office.findOne({ id });
@@ -104,23 +99,18 @@ router.put(
   auth.verifyRole(["admin", "edit"]),
   async (req, res) => {
     const idWorker = req.query.idWorker;
-    const idTag = req.query.idTag;
-    console.log(idTag);
-    console.log(idWorker);
-
-    const tag = await utils.getTag(req.body.tag);
-    const tag_id = tag._id;
+    const idOffice = req.query.idOffice;
 
     const worker = {
       "worker.$.totalyearlycompensation": req.body.totalyearlycompensation,
       "worker.$.monthlysalary": req.body.monthlysalary,
       "worker.$.yearsofexperience": req.body.yearsofexperience,
       "worker.$.yearsatcompany": req.body.yearsatcompany,
-      "worker.$.tag_id": tag_id,
+      "worker.$.tag_id": req.body.tag,
     };
 
     await Office.update(
-      { _id: idTag, "worker._id": idWorker },
+      { _id: idOffice, "worker._id": idWorker },
       {
         $set: worker,
       }
@@ -146,31 +136,13 @@ router.put(
   async (req, res) => {
     const id = req.query.id;
 
-    const location = await utils.getLocation(req.body.location);
-    const company = await utils.getCompanie(req.body.companie);
-    const locationId = location._id;
-    const companyId = company._id;
-    let officeUpdated;
+    const locationId = req.body.location;
+    const companyId = req.body.companie;
 
-    // Verificar se existe office com esta localização e empresa
-    await Office.findOne({ locationId, companyId })
-      .then((result) => {
-        if (result) {
-          res.json({
-            isSuccess: false,
-            data: "O Office para o qual tentou editar já existe",
-          });
-        } else {
-          officeUpdated = {
-            locationId: locationId,
-            companyId: companyId,
-          };
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        res.json({ isSuccess: false, data: "Ocorreu um erro" });
-      });
+    const officeUpdated = {
+      locationId: locationId,
+      companyId: companyId,
+    };
 
     await Office.findOneAndUpdate(
       { _id: id },
@@ -186,7 +158,10 @@ router.put(
         if (result) {
           res.json({ isSuccess: true, data: result });
         } else {
-          res.json({ isSuccess: false, data: "ID não existe" });
+          res.json({
+            isSuccess: false,
+            data: "ID não existe, foi criado um novo Office",
+          });
         }
       })
       .catch((error) => {

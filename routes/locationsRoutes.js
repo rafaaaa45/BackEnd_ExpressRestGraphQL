@@ -31,13 +31,31 @@ router.post(
   auth.verifyToken,
   auth.verifyRole(["admin", "edit"]),
   async (req, res) => {
-    try {
-      const location = await utils.getLocation(req.body.location);
-      res.json({ isSuccess: true, data: location });
-    } catch (err) {
-      console.log(err);
-      res.json({ isSuccess: false, data: "Ocorreu um erro" });
-    }
+    const location = {
+      location: req.body.location,
+    };
+
+    await Location.findOneAndUpdate(
+      { location: req.body.location },
+      {
+        $set: location,
+      },
+      {
+        //Caso não exista insere novo
+        upsert: true,
+      }
+    )
+      .then((result) => {
+        if (result) {
+          res.json({ isSuccess: false, data: result });
+        } else {
+          res.json({ isSuccess: true, data: "Nova Location criada" });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        res.json({ isSuccess: false, data: "Ocorreu um erro" });
+      });
   }
 );
 

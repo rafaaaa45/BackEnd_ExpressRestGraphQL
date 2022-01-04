@@ -31,13 +31,31 @@ router.post(
   auth.verifyToken,
   auth.verifyRole(["admin", "edit"]),
   async (req, res) => {
-    try {
-      const tag = await utils.getTag(req.body.tag);
-      res.json({ isSuccess: true, data: tag });
-    } catch (err) {
-      console.log(err);
-      res.json({ isSuccess: false, data: "Ocorreu um erro" });
-    }
+    const tag = {
+      tag: req.body.tag,
+    };
+
+    await Tag.findOneAndUpdate(
+      { tag: req.body.tag },
+      {
+        $set: tag,
+      },
+      {
+        //Caso não exista insere novo
+        upsert: true,
+      }
+    )
+      .then((result) => {
+        if (result) {
+          res.json({ isSuccess: false, data: result });
+        } else {
+          res.json({ isSuccess: true, data: "Nova Tag criada" });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        res.json({ isSuccess: false, data: "Ocorreu um erro" });
+      });
   }
 );
 
