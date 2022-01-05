@@ -35,7 +35,6 @@ router.post(
     if (utils.isValidTipo(tipo) === false) {
       return res.send("Insira um tipo Válido ( user | edit | admin )!");
     }
-
     try {
       const createdUtilizador = await newUtilizador.save();
 
@@ -47,13 +46,9 @@ router.post(
       );
 
       res.json(createdUtilizador);
-    } catch (err) {
-      if (err.code === 11000) {
-        res.json("Insira um email válido, esse email já foi usado!");
-      } else {
-        console.log(err);
-        res.json({ isSuccess: false, data: "Ocorreu um erro" });
-      }
+    } catch (error) {
+      let data = error.message;
+      res.json({ isSuccess: false, data });
     }
   }
 );
@@ -86,39 +81,45 @@ router.post("/login", async (req, res) => {
   }
 });
 
+//change Password(Insert old and new password)
 router.put(
   "/updateUser",
   auth.verifyToken,
   auth.verifyAdmin_Edit,
   async (req, res) => {
     const id = req.query.id;
+    const { oldPassword, newPassword } = req.body;
 
-    const tagUpdated = {
-      tag: req.body.tag,
-    };
-
-    await Tag.findOneAndUpdate(
-      { _id: id },
-      {
-        $set: tagUpdated,
-      },
-      {
-        //Caso não exista id insere
-        upsert: true,
-      }
-    )
-      .then((result) => {
-        if (result) {
-          console.log(result);
-          res.json({ isSuccess: true, data: result });
-        } else {
-          res.json({ isSuccess: false, data: "ID não existe" });
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        res.json({ isSuccess: false, data: "Ocorreu um erro" });
+    if (!newPassword) {
+      res.json({
+        isSuccess: false,
+        data: "Nova Password não pode ser null",
       });
+    }
+
+    let utilizador = await Utilizador.findById(id);
+
+    if (!utilizador) {
+      res.json({
+        isSuccess: false,
+        data: "Utilizador que procurou não existe",
+      });
+    }
+
+    if (utilizador.password === utils.encryptSha512(oldPassword)) {
+      newPasswordEncrypted = utils.encryptSha512(newPassword);
+      utilizador.password = newPasswordEncrypted;
+
+      utilizador
+        .save()
+        .then(() => {
+          res.json({ isSuccess: true, data: "Password alterada com sucesso!" });
+        })
+        .catch((error) => {
+          let data = error.message;
+          res.json({ isSuccess: false, data });
+        });
+    }
   }
 );
 

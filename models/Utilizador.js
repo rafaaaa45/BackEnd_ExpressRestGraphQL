@@ -9,16 +9,16 @@ const UtilizadorSchema = mongoose.Schema({
   },
   email: {
     type: String,
-    required: true,
     unique: true,
+    required: [true, "É obrigatório inserir o Email"],
   },
   password: {
     type: String,
-    required: true,
+    required: [true, "É obrigatório inserir a Password"],
   },
   tipo: {
     type: String,
-    required: true,
+    required: [true, "É obrigatório inserir o Tipo de Utilizador"],
   },
   token: { type: String },
 });

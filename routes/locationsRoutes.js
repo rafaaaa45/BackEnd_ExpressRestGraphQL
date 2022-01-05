@@ -13,7 +13,7 @@ router.get("/", auth.verifyToken, auth.verifyAny, async (req, res) => {
         if (result !== null) {
           res.json({ isSuccess: true, data: result });
         } else {
-          res.json({ isSuccess: true, data: "Location não encontrada" });
+          res.json({ isSuccess: false, data: "Location não encontrada" });
         }
       })
       .catch((err) => {

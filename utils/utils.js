@@ -22,6 +22,27 @@ const encryptSha512 = (password) => {
   return encryptedPW;
 };
 
+const createJWT = (id, email, tipo) => {
+  let newToken;
+
+  newToken = jwt.sign(
+    { user_id: id, email: email, tipo: tipo },
+    process.env.TOKEN_KEY,
+    {
+      expiresIn: "1h",
+    }
+  );
+
+  return newToken;
+};
+
+const isValidTipo = (tipo) => {
+  if (tipo != (Tipos.ADMIN || Tipos.EDIT || Tipos.VIEW)) {
+    return false;
+  }
+  return true;
+};
+
 /* const getLocation = async (location) => {
   let loc;
 
@@ -87,27 +108,6 @@ const encryptSha512 = (password) => {
 
   return t;
 }; */
-
-const createJWT = (id, email, tipo) => {
-  let newToken;
-
-  newToken = jwt.sign(
-    { user_id: id, email: email, tipo: tipo },
-    process.env.TOKEN_KEY,
-    {
-      expiresIn: "1h",
-    }
-  );
-
-  return newToken;
-};
-
-const isValidTipo = (tipo) => {
-  if (tipo != (Tipos.ADMIN || Tipos.EDIT || Tipos.VIEW)) {
-    return false;
-  }
-  return true;
-};
 
 exports.encryptSha512 = encryptSha512;
 exports.createJWT = createJWT;

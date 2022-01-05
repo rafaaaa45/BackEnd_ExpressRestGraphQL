@@ -13,7 +13,7 @@ router.get("/", auth.verifyToken, auth.verifyAny, async (req, res) => {
         if (result !== null) {
           res.json({ isSuccess: true, data: result });
         } else {
-          res.json({ isSuccess: true, data: "Companie não encontrada" });
+          res.json({ isSuccess: false, data: "Companie não encontrada" });
         }
       })
       .catch((err) => {
