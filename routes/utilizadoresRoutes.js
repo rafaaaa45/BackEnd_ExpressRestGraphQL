@@ -4,7 +4,16 @@ const Utilizador = require("../models/Utilizador");
 const utils = require("../utils/utils");
 const auth = require("../middleware/auth");
 
-//endpoint de login
+//get all users
+router.get("/", auth.verifyToken, auth.verifyAdmin, async (req, res) => {
+  await Utilizador.find()
+    .then((result) => {
+      res.json({ isSuccess: true, data: result });
+    })
+    .catch((err) => {
+      res.json({ isSuccess: false, data: "Ocorreu um erro" });
+    });
+});
 
 //endpoint criar user
 router.post(
@@ -57,7 +66,7 @@ router.post("/login", async (req, res) => {
       res.status(400).send("Todos os campos são obrigatórios");
     }
 
-    const user = await Utilizador.findOne({ email });
+    const user = await Utilizador.findOne({ email: email });
 
     if (user && utils.encryptSha512(password) === user.password) {
       // Create token
@@ -100,6 +109,7 @@ router.put(
     )
       .then((result) => {
         if (result) {
+          console.log(result);
           res.json({ isSuccess: true, data: result });
         } else {
           res.json({ isSuccess: false, data: "ID não existe" });
@@ -119,9 +129,9 @@ router.delete(
   async (req, res) => {
     const id = req.query.id;
 
-    await Tag.deleteOne({ _id: id })
+    await Utilizador.deleteOne({ _id: id })
       .then((result) => {
-        if (result) {
+        if (result.deletedCount > 0) {
           res.json({ isSuccess: true, data: result });
         } else {
           res.json({ isSuccess: false, data: "ID não existe" });

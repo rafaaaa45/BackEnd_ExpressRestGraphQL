@@ -8,12 +8,16 @@ router.get("/", auth.verifyToken, auth.verifyAny, async (req, res) => {
   const id = req.query.id;
 
   if (id) {
-    await Location.findOne({ id })
+    await Location.findById(id)
       .then((result) => {
-        res.json({ isSuccess: true, data: result });
+        if (result !== null) {
+          res.json({ isSuccess: true, data: result });
+        } else {
+          res.json({ isSuccess: true, data: "Location não encontrada" });
+        }
       })
       .catch((err) => {
-        res.json({ isSuccess: false, data: "ID não encontrado" });
+        res.json({ isSuccess: false, data: "Ocorreu um erro" });
       });
   } else {
     await Location.find()
@@ -106,10 +110,10 @@ router.delete(
 
     await Location.deleteOne({ _id: id })
       .then((result) => {
-        if (result) {
+        if (result.deletedCount > 0) {
           res.json({ isSuccess: true, data: result });
         } else {
-          res.json({ isSuccess: false, data: "ID não existe" });
+          res.json({ isSuccess: false, data: "Location não existe" });
         }
       })
       .catch((err) => {

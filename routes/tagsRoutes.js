@@ -8,12 +8,16 @@ router.get("/", auth.verifyToken, auth.verifyAny, async (req, res) => {
   const id = req.query.id;
 
   if (id) {
-    await Tag.findOne({ id })
+    await Tag.findById(id)
       .then((result) => {
-        res.json({ isSuccess: true, data: result });
+        if (result !== null) {
+          res.json({ isSuccess: true, data: result });
+        } else {
+          res.json({ isSuccess: true, data: "Tag não encontrada" });
+        }
       })
       .catch((err) => {
-        res.json({ isSuccess: false, data: "ID não encontrado" });
+        res.json({ isSuccess: false, data: "Ocorreu um erro" });
       });
   } else {
     await Tag.find()
@@ -108,10 +112,10 @@ router.delete(
 
     await Tag.deleteOne({ _id: id })
       .then((result) => {
-        if (result) {
+        if (result.deletedCount > 0) {
           res.json({ isSuccess: true, data: result });
         } else {
-          res.json({ isSuccess: false, data: "ID não existe" });
+          res.json({ isSuccess: false, data: "Tag não existe" });
         }
       })
       .catch((err) => {

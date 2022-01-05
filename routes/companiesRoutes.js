@@ -6,13 +6,18 @@ const auth = require("../middleware/auth");
 router.get("/", auth.verifyToken, auth.verifyAny, async (req, res) => {
   const id = req.query.id;
 
+  console.log(id);
   if (id) {
-    await Companie.findOne({ id })
+    await Companie.findById(id)
       .then((result) => {
-        res.json({ isSuccess: true, data: result });
+        if (result !== null) {
+          res.json({ isSuccess: true, data: result });
+        } else {
+          res.json({ isSuccess: true, data: "Companie não encontrada" });
+        }
       })
       .catch((err) => {
-        res.json({ isSuccess: false, data: "ID não encontrado" });
+        res.json({ isSuccess: false, data: "Ocorreu um erro" });
       });
   } else {
     await Companie.find()
@@ -105,10 +110,10 @@ router.delete(
 
     await Companie.deleteOne({ _id: id })
       .then((result) => {
-        if (result) {
+        if (result.deletedCount > 0) {
           res.json({ isSuccess: true, data: result });
         } else {
-          res.json({ isSuccess: false, data: "ID não existe" });
+          res.json({ isSuccess: false, data: "Companie não existe" });
         }
       })
       .catch((err) => {

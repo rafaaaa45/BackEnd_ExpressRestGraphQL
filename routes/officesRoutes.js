@@ -6,17 +6,20 @@ const Companie = require("../models/Companies");
 const utils = require("../utils/utils");
 const auth = require("../middleware/auth");
 
-//done
 router.get("/", auth.verifyToken, auth.verifyAny, async (req, res) => {
   const id = req.query.id;
 
   if (id) {
-    await Office.findOne({ id })
+    await Office.findById(id)
       .then((result) => {
-        res.json({ isSuccess: true, data: result });
+        if (result !== null) {
+          res.json({ isSuccess: true, data: result });
+        } else {
+          res.json({ isSuccess: false, data: "Office não encontrado" });
+        }
       })
       .catch((err) => {
-        res.json({ isSuccess: false, data: "ID não encontrado" });
+        res.json({ isSuccess: false, data: "Ocorreu um erro" });
       });
   } else {
     await Office.find()
@@ -29,7 +32,6 @@ router.get("/", auth.verifyToken, auth.verifyAny, async (req, res) => {
   }
 });
 
-//done
 router.post(
   "/createOffice",
   auth.verifyToken,
@@ -70,7 +72,6 @@ router.post(
   }
 );
 
-//rever
 router.put(
   "/addWorker",
   auth.verifyToken,
@@ -106,9 +107,14 @@ router.put(
       });
     }
 
-    let office = await Office.findOne({ id });
-    console.log(office);
+    let office = await Office.findById(id);
 
+    if (office === null) {
+      return res.json({
+        isSuccess: false,
+        data: "Office não encontrado",
+      });
+    }
     office.worker.push(worker);
     office
       .save()
@@ -122,7 +128,6 @@ router.put(
   }
 );
 
-//rever
 router.put(
   "/updateWorker",
   auth.verifyToken,
@@ -167,7 +172,6 @@ router.put(
   async (req, res) => {
     const id = req.query.id;
 
-    console.log(id);
     const locationId = req.body.location;
     const companyId = req.body.companie;
 
@@ -214,7 +218,7 @@ router.delete(
 
     await Office.deleteOne({ _id: id })
       .then((result) => {
-        if (result) {
+        if (result.deletedCount > 0) {
           res.json({ isSuccess: true, data: result });
         } else {
           res.json({ isSuccess: false, data: "ID não existe" });
