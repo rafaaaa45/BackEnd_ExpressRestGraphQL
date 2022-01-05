@@ -1,7 +1,7 @@
 const crypto = require("crypto");
 // const res = require("express/lib/response");
 // const Office = require("../models/Offices");
-// const Location = require("../models/Location");
+const Location = require("../models/Location");
 // const Tag = require("../models/Tags");
 // const Companie = require("../models/Companies");
 // const { nextTick } = require("process");
@@ -43,19 +43,13 @@ const isValidTipo = (tipo) => {
   return true;
 };
 
-/* const getLocation = async (location) => {
+const getLocation = async (location) => {
   let loc;
 
-  await Location.findOne({ location })
+  await Location.findOne({ _id: location })
     .then((result) => {
       if (result) {
         loc = result;
-      } else {
-        //cria o novo objeto de Location caso não exista
-        loc = new Location({
-          location: location,
-        });
-        loc.save();
       }
     })
     .catch((err) => {
@@ -63,7 +57,7 @@ const isValidTipo = (tipo) => {
     });
 
   return loc;
-}; */
+};
 
 /* const getCompanie = async (companie) => {
   let com;
@@ -113,6 +107,6 @@ exports.encryptSha512 = encryptSha512;
 exports.createJWT = createJWT;
 exports.Tipos = Tipos;
 exports.isValidTipo = isValidTipo;
-/* exports.getCompanie = getCompanie;
+//exports.getCompanie = getCompanie;
 exports.getLocation = getLocation;
-exports.getTag = getTag; */
+//exports.getTag = getTag;

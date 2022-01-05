@@ -51,7 +51,7 @@ router.post(
       }
     )
       .then((result) => {
-        res.json({ isSuccess: false, data: result });
+        res.json({ isSuccess: true, data: result });
       })
       .catch((error) => {
         let data = error.message;

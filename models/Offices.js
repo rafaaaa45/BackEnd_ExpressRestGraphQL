@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const WorkerSchema = require("./Workers");
 //guid, ids gerado
 const { v4: uuidv4 } = require("uuid");
 const { UUIDv4 } = require("uuid-v4-validator");
@@ -19,21 +20,15 @@ const OfficesSchema = mongoose.Schema({
   },
   locationId: {
     type: String,
+    ref: "locations",
     required: [true, "É obrigatório inserir nome da Localização"],
   },
   companyId: {
     type: String,
+    ref: "Companies",
     required: [true, "É obrigatório inserir nome da Company"],
   },
-  worker: [
-    {
-      totalyearlycompensation: Number,
-      monthlysalary: Number,
-      yearsofexperience: Number,
-      yearsatcompany: Number,
-      tag_id: String,
-    },
-  ],
+  workers: [WorkerSchema],
 });
 
-module.exports = mongoose.model("OfficesSchema", OfficesSchema);
+module.exports = mongoose.model("officesschema", OfficesSchema);
