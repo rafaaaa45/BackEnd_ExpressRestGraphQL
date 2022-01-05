@@ -3,15 +3,9 @@ const app = express();
 require("dotenv").config();
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const {
-  GraphQLSchema,
-  GraphQLObjectType,
-  GraphQLID,
-  GraphQLString,
-  GraphQLList,
-} = require("graphql");
+const { GraphQLSchema } = require("graphql");
 const { graphqlHTTP } = require("express-graphql");
-const Tag = require("./models/Tags.js");
+const queryResolver = require("./graphql/QueryResolvers.js");
 
 //conexão bdd mongodb
 require("./middleware/mongoDatabase").connect();
@@ -33,36 +27,12 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-//-------------------------- TESTES GRAPHQL ----------------
-
-const TagType = new GraphQLObjectType({
-  name: "Tag",
-  fields: () => ({
-    _id: { type: GraphQLID },
-    tag: { type: GraphQLString },
-  }),
-});
-
-const RootQuery = new GraphQLObjectType({
-  name: "getTags",
-  fields: {
-    getAllTags: {
-      type: new GraphQLList(TagType),
-      resolve(parent, args) {
-        return Tag.find().exec();
-      },
-    },
-  },
-});
-
-const Mutation = "TesteMutation";
-
+//GraphQl run server
 const schema = new GraphQLSchema({
-  query: RootQuery,
+  query: queryResolver,
   // mutation: Mutation,
 });
 
-//GraphQl run server
 app.use(
   "/api/graphql",
   graphqlHTTP({
@@ -72,7 +42,6 @@ app.use(
 );
 
 //Import Routes
-
 const utilizadorRoutes = require("./routes/utilizadoresRoutes");
 const locationRoutes = require("./routes/locationsRoutes");
 const companieRoutes = require("./routes/companiesRoutes");

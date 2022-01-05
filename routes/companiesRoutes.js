@@ -6,7 +6,6 @@ const auth = require("../middleware/auth");
 router.get("/", auth.verifyToken, auth.verifyAny, async (req, res) => {
   const id = req.query.id;
 
-  console.log(id);
   if (id) {
     await Companie.findById(id)
       .then((result) => {
@@ -48,14 +47,11 @@ router.post(
         //Caso não exista insere novo
         upsert: true,
         runValidators: true,
+        new: true,
       }
     )
       .then((result) => {
-        if (result) {
-          res.json({ isSuccess: false, data: result });
-        } else {
-          res.json({ isSuccess: true, data: "Nova Companie criada" });
-        }
+        res.json({ isSuccess: false, data: result });
       })
       .catch((error) => {
         let data = error.message;
@@ -83,16 +79,13 @@ router.put(
       },
       {
         //Caso não exista id insere
+        new: true,
         upsert: true,
         runValidators: true,
       }
     )
       .then((result) => {
-        if (result) {
-          res.json({ isSuccess: true, data: result });
-        } else {
-          res.json({ isSuccess: false, data: "ID não existe" });
-        }
+        res.json({ isSuccess: true, data: result });
       })
       .catch((error) => {
         let data = error.message;
