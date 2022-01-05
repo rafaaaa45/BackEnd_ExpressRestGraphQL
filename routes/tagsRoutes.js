@@ -113,7 +113,7 @@ router.delete(
     await Tag.deleteOne({ _id: id })
       .then((result) => {
         if (result.deletedCount > 0) {
-          res.json({ isSuccess: true, data: result });
+          res.json({ isSuccess: true, data: "Apagado Com Sucesso" });
         } else {
           res.json({ isSuccess: false, data: "Tag não existe" });
         }

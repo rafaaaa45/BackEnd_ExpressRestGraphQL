@@ -132,9 +132,9 @@ router.delete(
     await Utilizador.deleteOne({ _id: id })
       .then((result) => {
         if (result.deletedCount > 0) {
-          res.json({ isSuccess: true, data: result });
+          res.json({ isSuccess: true, data: "Apagado Com Sucesso" });
         } else {
-          res.json({ isSuccess: false, data: "ID não existe" });
+          res.json({ isSuccess: false, data: "Utilizador não existe" });
         }
       })
       .catch((err) => {

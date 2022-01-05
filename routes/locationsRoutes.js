@@ -111,7 +111,7 @@ router.delete(
     await Location.deleteOne({ _id: id })
       .then((result) => {
         if (result.deletedCount > 0) {
-          res.json({ isSuccess: true, data: result });
+          res.json({ isSuccess: true, data: "Apagado Com Sucesso" });
         } else {
           res.json({ isSuccess: false, data: "Location não existe" });
         }
