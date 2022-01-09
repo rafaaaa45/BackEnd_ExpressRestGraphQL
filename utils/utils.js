@@ -43,21 +43,21 @@ const isValidTipo = (tipo) => {
   return true;
 };
 
-const getLocation = async (location) => {
-  let loc;
+// const getLocation = async (location) => {
+//   let loc;
 
-  await Location.findOne({ _id: location })
-    .then((result) => {
-      if (result) {
-        loc = result;
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+//   await Location.findOne({ _id: location })
+//     .then((result) => {
+//       if (result) {
+//         loc = result;
+//       }
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     });
 
-  return loc;
-};
+//   return loc;
+// };
 
 /* const getCompanie = async (companie) => {
   let com;
@@ -108,5 +108,5 @@ exports.createJWT = createJWT;
 exports.Tipos = Tipos;
 exports.isValidTipo = isValidTipo;
 //exports.getCompanie = getCompanie;
-exports.getLocation = getLocation;
+// exports.getLocation = getLocation;
 //exports.getTag = getTag;

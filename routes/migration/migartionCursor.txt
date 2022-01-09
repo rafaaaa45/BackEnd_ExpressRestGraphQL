@@ -1,0 +1,92 @@
+
+/* criação de offices sem workers */
+
+    with locations as (select unnest(xpath('//locations/location/@nome' ,"importedFile"))::text as "location",
+        unnest(xpath('//locations/location/@id' ,"importedFile"))::text as "id" from "salariosXML" Where "isDeleted" = false and "id" = 13)
+            , empresas as (select unnest(xpath('//companies/company/@nome' ,"importedFile"))::text as "companie",
+        unnest(xpath('//companies/company/@id' ,"importedFile"))::text as "id" from "salariosXML" Where "isDeleted" = false and "id" = 13)
+            , offices_idLocation_idEmpresa as (select unnest(xpath('//offices/office/location/@ref' ,"importedFile"))::text as "idl",
+        unnest(xpath('//offices/office/company/@ref' ,"importedFile"))::text "ide" from "salariosXML" Where "isDeleted" = false and "id" = 13)
+            , offices_Location_Empresa as (select l.location, e.companie  from offices_idLocation_idEmpresa as o 
+                INNER JOIN locations as l ON o.idl = l.id 
+                Inner join empresas as e ON o.ide = e.id),
+	  todasTags as (select unnest(xpath('//tags/tag/@nome' ,"importedFile"))::text as "tags",
+     unnest(xpath('//tags/tag/@id' ,"importedFile"))::text as "ids" from "salariosXML" Where "isDeleted" = false and "id" = 13),
+     workers as (select unnest(xpath('//workers/worker/totalyearlycompensation/text()' , subquery.workers))::text as "totalyearlycompensation" ,
+				 unnest(xpath('//workers/worker/tag/@ref' , subquery.workers))::text as "idtagworker",
+				 unnest(xpath('//workers/worker/monthlysalary/text()' , subquery.workers))::text as "monthlysalary",
+				 unnest(xpath('//workers/worker/yearsofexperience/text()' , subquery.workers))::text as "yearsofexperience",
+				 unnest(xpath('//workers/worker/yearsatcompany/text()' , subquery.workers))::text as "yearsatcompany"
+				 from (SELECT  unnest(xpath('//offices/office/workers' ,"importedFile")) as "workers" from "salariosXML" Where "isDeleted" = false and "id" = 13 limit 1 offset 0)subquery),
+	workerResult as (Select json_agg(workerobject) as workers from 
+  (Select json_build_object('totalyearlycompensation',totalyearlycompensation, 'tag' , tag.tags,'yearsatcompany', yearsatcompany,'monthlysalary', monthlysalary , 'yearsofexperience',yearsofexperience)workerobject
+   from workers as w inner join todasTags as tag on tag.ids = w.idtagworker )worker),
+  officeresult as (SELECT (json_build_object('location', location, 'companie' , companie )) as location_companie from offices_Location_Empresa limit 1 offset 0)
+    SELECT * , (Select * from workerResult) from officeResult
+
+
+
+
+
+
+
+	   
+
+
+/* Cursor Usado */
+	
+CREATE OR REPLACE FUNCTION listagem_of() 
+RETURNS json
+AS 
+$$
+DECLARE 
+    idTabela integer;
+    i integer;
+    offi RECORD;
+    DECLARE offices cursor(idt integer, j integer) for
+      with locations as (select unnest(xpath('//locations/location/@nome' ,"importedFile"))::text as "location",
+        unnest(xpath('//locations/location/@id' ,"importedFile"))::text as "id" from "salariosXML" Where "isDeleted" = false and "id" = idt)
+            , empresas as (select unnest(xpath('//companies/company/@nome' ,"importedFile"))::text as "companie",
+        unnest(xpath('//companies/company/@id' ,"importedFile"))::text as "id" from "salariosXML" Where "isDeleted" = false and "id" = idt)
+            , offices_idLocation_idEmpresa as (select unnest(xpath('//offices/office/location/@ref' ,"importedFile"))::text as "idl",
+        unnest(xpath('//offices/office/company/@ref' ,"importedFile"))::text "ide" from "salariosXML" Where "isDeleted" = false and "id" = idt)
+            , offices_Location_Empresa as (select l.location, e.companie  from offices_idLocation_idEmpresa as o 
+                INNER JOIN locations as l ON o.idl = l.id 
+                Inner join empresas as e ON o.ide = e.id),
+	  todasTags as (select unnest(xpath('//tags/tag/@nome' ,"importedFile"))::text as "tags",
+     unnest(xpath('//tags/tag/@id' ,"importedFile"))::text as "ids" from "salariosXML" Where "isDeleted" = false and "id" = idt),
+     workers as (select unnest(xpath('//workers/worker/totalyearlycompensation/text()' , subquery.workers))::text as "totalyearlycompensation" ,
+				 unnest(xpath('//workers/worker/tag/@ref' , subquery.workers))::text as "idtagworker",
+				 unnest(xpath('//workers/worker/monthlysalary/text()' , subquery.workers))::text as "monthlysalary",
+				 unnest(xpath('//workers/worker/yearsofexperience/text()' , subquery.workers))::text as "yearsofexperience",
+				 unnest(xpath('//workers/worker/yearsatcompany/text()' , subquery.workers))::text as "yearsatcompany"
+				 from (SELECT  unnest(xpath('//offices/office/workers' ,"importedFile")) as "workers" from "salariosXML" Where "isDeleted" = false and "id" = idt limit 1 offset j)subquery),
+	workerResult as (Select json_agg(workerobject) as workers from 
+  (Select json_build_object('totalyearlycompensation',totalyearlycompensation, 'tag' , tag.tags,'yearsatcompany', yearsatcompany,'monthlysalary', monthlysalary , 'yearsofexperience',yearsofexperience)workerobject
+   from workers as w inner join todasTags as tag on tag.ids = w.idtagworker )worker),
+  officeresult as (SELECT (json_build_object('location', location, 'companie' , companie )) as location_companie from offices_Location_Empresa limit 1 offset j)
+    SELECT json_build_object('locationscompanies' , location_companie , 'workers', (Select * from workerResult)) as finalResult from officeResult;
+BEGIN
+    for idTabela in Select id from "salariosXML" where "isDeleted" = false loop
+        i:= 0;
+        raise notice 'id: %', idTabela;
+        loop
+            open offices(idTabela, i);
+            fetch next from offices into offi;
+			CLOSE offices;
+			if not found then
+       			 exit ;
+  		    end if;
+
+            i:= i + 1; 
+          
+			return offi.finalResult;	
+        end loop;
+    end loop;
+END;
+$$ LANGUAGE plpgsql;
+
+
+select listagem_of();
+	
+DROP FUNCTION listagem_of()
