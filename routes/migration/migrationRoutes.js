@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const auth = require("../../middleware/auth");
 const { Pool } = require("pg");
+const Companie = require("../../models/Companies.js");
+const { isUnionType } = require("graphql");
 
 //pool Postgres
 const pool = new Pool({
@@ -15,32 +17,61 @@ const pool = new Pool({
 
 router.get("/migrate", async (req, res) => {
   const query = `select listagem_of();`;
+  let insertError = false;
 
   pool.connect((err, client, done) => {
     if (err) {
       return res.json({ isSuccess: false, data: "Erro na Conexão" });
     }
-    client.query(query, (err, response) => {
+
+    client.query(query, async (err, response) => {
       done();
       if (err) {
         console.log(err);
         return res.json({ isSuccess: false, data: "Erro na Migração" });
       } else {
-        console.log(
-          response.rows[0].listagem_of.workers[0].totalyearlycompensation.trim()
-        );
+        Promise.all(
+          response.rows.map(async (office) => {
+            const { listagem_of } = office;
+            let companieUpserted;
+            let locationUpserted;
 
-        res.send(
-          response.rows[0].listagem_of.workers[0].totalyearlycompensation
-        );
-
-        //upsert location
-
-        // upsert company
+            await Companie.findOneAndUpdate(
+              { companie: listagem_of.locationscompanies.companie },
+              {
+                $set: { companie: listagem_of.locationscompanies.companie },
+              },
+              {
+                //Caso não exista insere novo
+                upsert: true,
+                runValidators: true,
+                new: true,
+              }
+            )
+              .then((result) => {
+                companieUpserted = result;
+              })
+              .catch((error) => {
+                insertError = true;
+                let data = error.message;
+                console.log(data);
+              });
+          })
+        ).then(() => {
+          //se ocorreu um erro ou mal
+          if (insertError) {
+            console.log("correu mal");
+          } else {
+            console.log("correu bem");
+          }
+        });
 
         //create office with the workers trim
 
         //por fim res.send com suceso ou não
+        // res.send(
+        //   response.rows[0].listagem_of.workers[0].totalyearlycompensation
+        // );
       }
     });
   });
