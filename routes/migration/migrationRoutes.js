@@ -3,7 +3,8 @@ const router = express.Router();
 const auth = require("../../middleware/auth");
 const { Pool } = require("pg");
 const Companie = require("../../models/Companies.js");
-const { isUnionType } = require("graphql");
+const Location = require("../../models/Location");
+const Office = require("../../models/Offices");
 
 //pool Postgres
 const pool = new Pool({
@@ -56,6 +57,58 @@ router.get("/migrate", async (req, res) => {
                 let data = error.message;
                 console.log(data);
               });
+
+            await Location.findOneAndUpdate(
+              { location: listagem_of.locationscompanies.location },
+              {
+                $set: { location: listagem_of.locationscompanies.location },
+              },
+              {
+                //Caso não exista insere novo
+                upsert: true,
+                new: true,
+                runValidators: true,
+              }
+            )
+              .then((result) => {
+                locationUpserted = result;
+                console.log(locationUpserted);
+              })
+              .catch((error) => {
+                insertError = true;
+                let data = error.message;
+                console.log(data);
+              });
+
+            const officeObject = {
+              locationId: locationUpserted._id,
+              companyId: companieUpserted._id,
+              worker: listagem_of.workers,
+            };
+
+            await Office.findOneAndUpdate(
+              {
+                locationId: locationUpserted._id,
+                companyId: companieUpserted._id,
+              },
+              {
+                $set: officeObject,
+              },
+              {
+                //Caso não exista insere novo
+                upsert: true,
+                new: true,
+                runValidators: true,
+              }
+            )
+              .then((result) => {
+                console.log(result);
+              })
+              .catch((error) => {
+                insertError = true;
+                let data = error.message;
+                console.log(data);
+              });
           })
         ).then(() => {
           //se ocorreu um erro ou mal
@@ -65,13 +118,6 @@ router.get("/migrate", async (req, res) => {
             console.log("correu bem");
           }
         });
-
-        //create office with the workers trim
-
-        //por fim res.send com suceso ou não
-        // res.send(
-        //   response.rows[0].listagem_of.workers[0].totalyearlycompensation
-        // );
       }
     });
   });
