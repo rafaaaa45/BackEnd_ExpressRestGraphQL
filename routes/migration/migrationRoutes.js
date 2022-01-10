@@ -59,8 +59,9 @@ router.get("/startMigration", async (req, res) => {
                 }
               )
                 .then((result) => {
+                  countInserted = countInserted + 1;
                   companieUpserted = result;
-                  console.log(companieUpserted);
+                  // console.log(companieUpserted);
                 })
                 .catch((error) => {
                   insertError = true;
@@ -81,8 +82,9 @@ router.get("/startMigration", async (req, res) => {
                 }
               )
                 .then((result) => {
+                  countInserted = countInserted + 1;
                   locationUpserted = result;
-                  console.log(locationUpserted);
+                  // console.log(locationUpserted);
                 })
                 .catch((error) => {
                   insertError = true;
@@ -113,20 +115,18 @@ router.get("/startMigration", async (req, res) => {
                 }
               )
                 .then((result) => {
-                  console.log(result);
+                  countInserted = countInserted + 1;
+                  // console.log(result);
                 })
                 .catch((error) => {
                   insertError = true;
                   let data = error.message;
                   console.log("Erro ao Inserir Office" + data);
                 });
-              countInserted = countInserted + 1;
-              console.log(countInserted);
             })
           ).then(() => {
             //permitir de novo fazer importações
             isLocked = false;
-            countInserted = 0;
 
             //se ocorreu um erro ou mal
             if (insertError) {
@@ -135,9 +135,12 @@ router.get("/startMigration", async (req, res) => {
                 data: "Erro na Importação!",
               });
             } else {
+              totalInserted = countInserted;
+              countInserted = 0;
+
               return res.json({
                 isSuccess: true,
-                data: `Importação concluída, foram inseridos ${countInserted} registos!`,
+                data: `Importação concluída, foram inseridos ${totalInserted} registos!`,
               });
             }
           });
@@ -173,7 +176,7 @@ router.get("/migrationState", async (req, res) => {
 
           let percentagemAtual = (countInserted * 100) / totalToInsert;
 
-          console.log("total para inserir" + totalToInsert);
+          console.log("total para inserir " + totalToInsert);
 
           console.log("totais inseridos" + countInserted);
 
