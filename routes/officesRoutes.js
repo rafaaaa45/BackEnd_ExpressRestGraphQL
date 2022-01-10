@@ -86,6 +86,7 @@ router.post(
       }
     )
       .then((result) => {
+        console.log(result);
         res.json({ isSuccess: true, data: result });
       })
       .catch((error) => {
