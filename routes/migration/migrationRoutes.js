@@ -23,7 +23,7 @@ let totalToInsert = 0;
 let isLocked = false;
 
 router.get("/startMigration", async (req, res) => {
-  const getOffices = `select listagem_of();`;
+  const getOffices = `select listagem_of(23);`;
 
   let insertError = false;
   if (!isLocked) {
@@ -95,7 +95,6 @@ router.get("/startMigration", async (req, res) => {
               const officeObject = {
                 locationId: locationUpserted._id,
                 companyId: companieUpserted._id,
-                worker: listagem_of.workers,
               };
 
               // console.log(listagem_of.workers);
@@ -175,10 +174,6 @@ router.get("/migrationState", async (req, res) => {
           totalToInsert = response.rows[0].count;
 
           let percentagemAtual = (countInserted * 100) / totalToInsert;
-
-          console.log("total para inserir " + totalToInsert);
-
-          console.log("totais inseridos" + countInserted);
 
           totalToInsert = 0;
           return res.json({

@@ -70,7 +70,7 @@ router.post(
     const office = {
       locationId: locationId,
       companyId: companyId,
-      worker: workers,
+      workers: workers,
     };
 
     await Office.findOneAndUpdate(
@@ -86,7 +86,7 @@ router.post(
       }
     )
       .then((result) => {
-        console.log(result);
+        // console.log(result);
         res.json({ isSuccess: true, data: result });
       })
       .catch((error) => {
