@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Companie = require("../models/Companies");
+const Office = require("../models/Offices");
 const auth = require("../middleware/auth");
 
 router.get("/", auth.verifyToken, auth.verifyAny, async (req, res) => {
@@ -100,6 +101,14 @@ router.delete(
   auth.verifyAdmin_Edit,
   async (req, res) => {
     const id = req.query.id;
+
+    let office = await Office.find({ companyId: id });
+    if (office.length > 0) {
+      return res.json({
+        isSuccess: false,
+        data: "Não pode apagar esta company pois tem office(s) associado(s).",
+      });
+    }
 
     await Companie.deleteOne({ _id: id })
       .then((result) => {

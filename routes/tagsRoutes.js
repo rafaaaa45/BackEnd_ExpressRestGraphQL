@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Tag = require("../models/Tags");
+const Office = require("../models/Offices");
 const utils = require("../utils/utils");
 const auth = require("../middleware/auth");
 
@@ -103,6 +104,14 @@ router.delete(
   auth.verifyAdmin_Edit,
   async (req, res) => {
     const id = req.query.id;
+
+    let worker = await Office.find({ "workers.tag_id": id });
+    if (worker.length > 0) {
+      return res.json({
+        isSuccess: false,
+        data: "Não pode apagar esta tag pois tem worker(s) associado(s).",
+      });
+    }
 
     await Tag.deleteOne({ _id: id })
       .then((result) => {

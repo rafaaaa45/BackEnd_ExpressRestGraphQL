@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Location = require("../models/Location");
+const Office = require("../models/Offices");
 const utils = require("../utils/utils");
 const auth = require("../middleware/auth");
 
@@ -101,6 +102,14 @@ router.delete(
   auth.verifyAdmin_Edit,
   async (req, res) => {
     const id = req.query.id;
+
+    let office = await Office.find({ locationId: id });
+    if (office.length > 0) {
+      return res.json({
+        isSuccess: false,
+        data: "Não pode apagar esta location pois tem office(s) associado(s).",
+      });
+    }
 
     await Location.deleteOne({ _id: id })
       .then((result) => {

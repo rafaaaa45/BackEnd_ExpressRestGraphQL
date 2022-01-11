@@ -103,61 +103,48 @@ router.put(
   auth.verifyToken,
   auth.verifyAdmin_Edit,
   async (req, res) => {
-    const id = req.query.id;
-    const {
-      totalyearlycompensation,
-      monthlysalary,
-      yearsofexperience,
-      yearsatcompany,
-      tag,
-    } = req.body;
+    const idOffice = req.query.id;
+    const data = req.body;
 
-    if (tag !== "") {
-      let tags = await Tag.findById(tag);
+    for (const worker of data) {
+      if (worker.tag !== "") {
+        const tag = await Tag.findById(worker.tag_id);
 
-      if (tags === null) {
-        return res.json({
-          isSuccess: false,
-          data: "Tag não existe",
-        });
+        if (tag === null) {
+          return res.json({
+            isSuccess: false,
+            data: "Não existe tag para o UUID " + worker.tag_id,
+          });
+        }
+      } else {
+        //se enviar o worker a null enviar erro
+        if (
+          !worker.totalyearlycompensation &&
+          !worker.monthlysalary &&
+          !worker.yearsofexperience &&
+          !worker.tag_id
+        ) {
+          return res.json({
+            isSuccess: false,
+            data: "Necessita de Adicionar os dados do Worker",
+          });
+        }
       }
     }
 
-    const worker = {
-      totalyearlycompensation: totalyearlycompensation || null,
-      monthlysalary: monthlysalary || null,
-      yearsofexperience: yearsofexperience || null,
-      yearsatcompany: yearsatcompany || null,
-      tag_id: tag || null,
-    };
-
-    //se enviar o worker a null enviar erro
-    if (
-      !totalyearlycompensation &&
-      !monthlysalary &&
-      !yearsofexperience &&
-      !tag
-    ) {
-      return res.json({
-        isSuccess: false,
-        data: "Necessita de Adicionar os dados do Worker",
-      });
-    }
-
-    let office = await Office.findById(id);
-
-    if (office === null) {
-      return res.json({
-        isSuccess: false,
-        data: "Office não encontrado",
-      });
-    }
-
-    office.workers.push(worker);
-    office
-      .save()
+    await Office.updateOne(
+      { _id: idOffice },
+      {
+        $push: { workers: data },
+      }
+    )
       .then((result) => {
-        res.json({ isSuccess: true, data: result });
+        console.log(result);
+        if (result.modifiedCount) {
+          res.json({ isSuccess: true, data: "Worker(s) inserido(s)!" });
+        } else {
+          res.json({ isSuccess: false, data: "Não foi encontrado o office!" });
+        }
       })
       .catch((error) => {
         let data = error.message;
