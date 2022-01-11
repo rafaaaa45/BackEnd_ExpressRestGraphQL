@@ -51,6 +51,32 @@ router.post(
 
     let location = await Location.findById(locationId);
 
+    for (const worker of workers) {
+      if (worker.tag !== "") {
+        const tag = await Tag.findById(worker.tag_id);
+
+        if (tag === null) {
+          return res.json({
+            isSuccess: false,
+            data: "Não existe tag para o UUID " + worker.tag_id,
+          });
+        }
+      } else {
+        //se enviar o worker a null enviar erro
+        if (
+          !worker.totalyearlycompensation &&
+          !worker.monthlysalary &&
+          !worker.yearsofexperience &&
+          !worker.tag_id
+        ) {
+          return res.json({
+            isSuccess: false,
+            data: "Necessita de Adicionar os dados do Worker",
+          });
+        }
+      }
+    }
+
     if (location === null) {
       return res.json({
         isSuccess: false,
