@@ -38,9 +38,6 @@ router.get("/", auth.verifyToken, auth.verifyAny, async (req, res) => {
         res.json({ isSuccess: false, data: "Ocorreu um erro" });
       });
   }
-  //console.log(locationId);
-  //const loc = await utils.getLocation(locationId);
-  //console.log(loc.location);
 });
 
 router.post(
@@ -89,6 +86,7 @@ router.post(
       }
     )
       .then((result) => {
+        console.log(result);
         res.json({ isSuccess: true, data: result });
       })
       .catch((error) => {

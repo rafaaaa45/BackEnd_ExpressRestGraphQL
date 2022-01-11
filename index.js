@@ -47,12 +47,14 @@ const locationRoutes = require("./routes/locationsRoutes");
 const companieRoutes = require("./routes/companiesRoutes");
 const tagRoutes = require("./routes/tagsRoutes");
 const officeRoutes = require("./routes/officesRoutes");
+const migrationRoutes = require("./routes/migration/migrationRoutes");
 
 app.use("/api/utilizador", utilizadorRoutes);
 app.use("/api/locations", locationRoutes);
 app.use("/api/companies", companieRoutes);
 app.use("/api/offices", officeRoutes);
 app.use("/api/tags", tagRoutes);
+app.use("/api/migration", migrationRoutes);
 
 //Iniciar o Servidor
 app.listen(process.env.PORT, () => {
