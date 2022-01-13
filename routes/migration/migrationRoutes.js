@@ -35,7 +35,6 @@ router.get("/startMigration", async (req, res) => {
         try {
           response = await pool.query(getOffices, [ficheiro.id]);
 
-          console.log(response);
           for (const office of response.rows) {
             const { locationscompanies, workers } = office.listagem_offices;
             let companieUpserted;
