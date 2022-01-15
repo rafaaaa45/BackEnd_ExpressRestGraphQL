@@ -4,11 +4,9 @@ const utils = require("../utils/utils");
 const config = process.env;
 
 const verifyToken = (req, res, next) => {
-  // const token =
-  //   req.body.token || req.query.token || req.headers["x-access-token"];
-
   const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYzk0MjU4ZTEtOWZkYi00NDY1LTkyNWEtM2FjNjc1MDhiOWI1IiwiZW1haWwiOiJhZG1pbkBhZG1pbi5wdCIsInRpcG8iOiJhZG1pbiIsImlhdCI6MTY0MTkzMjYyMiwiZXhwIjoxNjQxOTM2MjIyfQ.L6e8glD5IZiSKm35qzo8e9MakYjgs992we-_TT9YIM4";
+    req.body.token || req.query.token || req.headers["x-access-token"];
+
   if (!token) {
     return res.send("Necessita de um token para Autenticar!");
   }

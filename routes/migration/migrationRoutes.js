@@ -23,102 +23,44 @@ let countInserted = 0;
 let totalToInsert = 0;
 let isLocked = false;
 
-router.get("/startMigration", async (req, res) => {
-  const getOffices = `select listagem_offices($1);`;
+router.get(
+  "/startMigration",
+  auth.verifyToken,
+  auth.verifyAdmin,
+  async (req, res) => {
+    const getOffices = `select listagem_offices($1);`;
 
-  if (!isLocked) {
-    isLocked = true;
-    let idFicheiros = await utils.idFiles();
+    if (!isLocked) {
+      isLocked = true;
+      let idFicheiros = await utils.idFiles();
 
-    Promise.all(
-      idFicheiros.map(async (ficheiro) => {
-        try {
-          response = await pool.query(getOffices, [ficheiro.id]);
+      Promise.all(
+        idFicheiros.map(async (ficheiro) => {
+          try {
+            response = await pool.query(getOffices, [ficheiro.id]);
 
-          for (const office of response.rows) {
-            const { locationscompanies, workers } = office.listagem_offices;
-            let companieUpserted;
-            let locationUpserted;
-            let officeUpserted;
+            for (const office of response.rows) {
+              const { locationscompanies, workers } = office.listagem_offices;
+              let companieUpserted;
+              let locationUpserted;
+              let officeUpserted;
 
-            await Companie.findOneAndUpdate(
-              { companie: locationscompanies.companie },
-              {
-                $set: { companie: locationscompanies.companie },
-              },
-              {
-                //Caso não exista insere novo
-                upsert: true,
-                runValidators: true,
-                new: true,
-              }
-            )
-              .then((result) => {
-                countInserted = countInserted + 1;
-                companieUpserted = result;
-                // console.log(companieUpserted);
-              })
-              .catch((error) => {
-                countInserted = 0;
-                totalToInsert = 0;
-                isLocked = false;
-
-                return res.json({
-                  isSuccess: false,
-                  data: "Erro na migração ao inserir Companie",
-                });
-              });
-
-            await Location.findOneAndUpdate(
-              { location: locationscompanies.location },
-              {
-                $set: { location: locationscompanies.location },
-              },
-              {
-                //Caso não exista insere novo
-                upsert: true,
-                new: true,
-                runValidators: true,
-              }
-            )
-              .then((result) => {
-                countInserted = countInserted + 1;
-                locationUpserted = result;
-                // console.log(locationUpserted);
-              })
-              .catch((error) => {
-                countInserted = 0;
-                totalToInsert = 0;
-                isLocked = false;
-
-                return res.json({
-                  isSuccess: false,
-                  data: "Erro na migração ao inserir Location",
-                });
-              });
-
-            //trocar pela respetiva tag
-            for (const singleWorker of workers) {
-              let insertedTag;
-
-              const tag = {
-                tag: singleWorker.tag_id,
-              };
-
-              await Tag.findOneAndUpdate(
-                { tag: singleWorker.tag_id },
+              await Companie.findOneAndUpdate(
+                { companie: locationscompanies.companie },
                 {
-                  $set: tag,
+                  $set: { companie: locationscompanies.companie },
                 },
-
                 {
+                  //Caso não exista insere novo
                   upsert: true,
+                  runValidators: true,
+                  new: true,
                 }
               )
                 .then((result) => {
-                  insertedTag = result;
                   countInserted = countInserted + 1;
-                  // console.log(result);
+                  companieUpserted = result;
+                  // console.log(companieUpserted);
                 })
                 .catch((error) => {
                   countInserted = 0;
@@ -127,116 +69,184 @@ router.get("/startMigration", async (req, res) => {
 
                   return res.json({
                     isSuccess: false,
-                    data: "Erro na migração ao inserir Tag",
+                    data: "Erro na migração ao inserir Companie",
                   });
                 });
 
-              singleWorker.tag_id = insertedTag._id;
-            }
+              await Location.findOneAndUpdate(
+                { location: locationscompanies.location },
+                {
+                  $set: { location: locationscompanies.location },
+                },
+                {
+                  //Caso não exista insere novo
+                  upsert: true,
+                  new: true,
+                  runValidators: true,
+                }
+              )
+                .then((result) => {
+                  countInserted = countInserted + 1;
+                  locationUpserted = result;
+                  // console.log(locationUpserted);
+                })
+                .catch((error) => {
+                  countInserted = 0;
+                  totalToInsert = 0;
+                  isLocked = false;
 
-            const officeObject = {
-              locationId: locationUpserted._id,
-              companyId: companieUpserted._id,
-              workers: workers,
-            };
+                  return res.json({
+                    isSuccess: false,
+                    data: "Erro na migração ao inserir Location",
+                  });
+                });
 
-            await Office.findOneAndUpdate(
-              {
+              //trocar pela respetiva tag
+              for (const singleWorker of workers) {
+                let insertedTag;
+
+                const tag = {
+                  tag: singleWorker.tag_id,
+                };
+
+                await Tag.findOneAndUpdate(
+                  { tag: singleWorker.tag_id },
+                  {
+                    $set: tag,
+                  },
+
+                  {
+                    upsert: true,
+                  }
+                )
+                  .then((result) => {
+                    insertedTag = result;
+                    countInserted = countInserted + 1;
+                    // console.log(result);
+                  })
+                  .catch((error) => {
+                    countInserted = 0;
+                    totalToInsert = 0;
+                    isLocked = false;
+
+                    return res.json({
+                      isSuccess: false,
+                      data: "Erro na migração ao inserir Tag",
+                    });
+                  });
+
+                singleWorker.tag_id = insertedTag._id;
+              }
+
+              const officeObject = {
                 locationId: locationUpserted._id,
                 companyId: companieUpserted._id,
-              },
-              {
-                $set: officeObject,
-              },
-              {
-                //Caso não exista insere novo
-                upsert: true,
-                new: true,
-                runValidators: true,
-              }
-            )
-              .then((result) => {
-                countInserted = countInserted + 1;
-                officeUpserted = result;
-              })
-              .catch((error) => {
-                countInserted = 0;
-                totalToInsert = 0;
-                isLocked = false;
-                return res.json({
-                  isSuccess: false,
-                  data: "Erro na migração ao inserir Office",
+                workers: workers,
+              };
+
+              await Office.findOneAndUpdate(
+                {
+                  locationId: locationUpserted._id,
+                  companyId: companieUpserted._id,
+                },
+                {
+                  $set: officeObject,
+                },
+                {
+                  //Caso não exista insere novo
+                  upsert: true,
+                  new: true,
+                  runValidators: true,
+                }
+              )
+                .then((result) => {
+                  countInserted = countInserted + 1;
+                  officeUpserted = result;
+                })
+                .catch((error) => {
+                  countInserted = 0;
+                  totalToInsert = 0;
+                  isLocked = false;
+                  return res.json({
+                    isSuccess: false,
+                    data: "Erro na migração ao inserir Office",
+                  });
                 });
-              });
+            }
+          } catch {
+            countInserted = 0;
+            totalToInsert = 0;
+            isLocked = false;
+
+            return res.json({
+              isSuccess: false,
+              data: "Erro na migração ",
+            });
           }
-        } catch {
-          countInserted = 0;
-          totalToInsert = 0;
-          isLocked = false;
+        })
+      ).then(() => {
+        //return when finished
+        countInserted = 0;
+        totalToInsert = 0;
+        isLocked = false;
 
-          return res.json({
-            isSuccess: false,
-            data: "Erro na migração ",
-          });
-        }
-      })
-    ).then(() => {
-      //return when finished
-      countInserted = 0;
-      totalToInsert = 0;
-      isLocked = false;
-
-      return res.json({
-        isSuccess: true,
-        data: "Migração Concluida",
+        return res.json({
+          isSuccess: true,
+          data: "Migração Concluida",
+        });
       });
-    });
-  } else {
-    return res.json({
-      isSuccess: false,
-      data: `Já está a decorrer uma Importação! Espere até terminir a Importação atual.`,
-    });
+    } else {
+      return res.json({
+        isSuccess: false,
+        data: `Já está a decorrer uma Importação! Espere até terminir a Importação atual.`,
+      });
+    }
   }
-});
+);
 
 //done
-router.get("/migrationState", async (req, res) => {
-  const countOffices = `Select * from countOffices;`;
-  if (isLocked) {
-    pool.connect((err, client, done) => {
-      if (err) {
-        return res.json({ isSuccess: false, data: "Erro na Conexão" });
-      }
-      client.query(countOffices, (err, response) => {
-        done();
-
+router.get(
+  "/migrationState",
+  auth.verifyToken,
+  auth.verifyAdmin,
+  async (req, res) => {
+    const countOffices = `Select * from countOffices;`;
+    if (isLocked) {
+      pool.connect((err, client, done) => {
         if (err) {
-          console.log(err);
-          return res.json({
-            isSuccess: false,
-            data: "Erro ao obter o estado da Importação",
-          });
-        } else {
-          totalToInsert = response.rows[0].count;
-
-          let percentagemAtual = (countInserted * 100) / totalToInsert;
-
-          totalToInsert = 0;
-          return res.json({
-            isSuccess: true,
-            data: `Encontra se a decorrer uma Importação, percentagem de conclusão : ${percentagemAtual.toFixed(
-              2
-            )} %`,
-          });
+          return res.json({ isSuccess: false, data: "Erro na Conexão" });
         }
+        client.query(countOffices, (err, response) => {
+          done();
+
+          if (err) {
+            console.log(err);
+            return res.json({
+              isSuccess: false,
+              data: "Erro ao obter o estado da Importação",
+            });
+          } else {
+            totalToInsert = response.rows[0].count;
+
+            let percentagemAtual = (countInserted * 100) / totalToInsert;
+
+            totalToInsert = 0;
+            return res.json({
+              isSuccess: true,
+              data: `Encontra se a decorrer uma Importação, percentagem de conclusão : ${percentagemAtual.toFixed(
+                2
+              )} %`,
+            });
+          }
+        });
       });
-    });
-  } else {
-    return res.json({
-      isSuccess: false,
-      data: "Não existem importações a decorrer",
-    });
+    } else {
+      return res.json({
+        isSuccess: false,
+        data: "Não existem importações a decorrer",
+      });
+    }
   }
-});
+);
 
 module.exports = router;
