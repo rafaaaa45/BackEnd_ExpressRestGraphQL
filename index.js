@@ -16,17 +16,6 @@ app.use(bodyParser.json());
 //permitir o cors
 app.use(cors({ credentials: true, origin: true }));
 
-const { v4: uuidv4 } = require("uuid");
-const { UUIDv4 } = require("uuid-v4-validator");
-
-//Tests Endpoint
-app.get("/", (req, res) => {
-  const newGUID = uuidv4();
-  console.log(newGUID);
-  console.log(UUIDv4.validate("123"));
-  res.send("Hello World!");
-});
-
 //GraphQl run server
 const schema = new GraphQLSchema({
   query: queryResolver,
