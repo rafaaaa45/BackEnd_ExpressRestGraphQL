@@ -45,7 +45,7 @@ router.post(
         tipo
       );
 
-      res.json(createdUtilizador);
+      res.json({ isSuccess: true, data: createdUtilizador.token });
     } catch (error) {
       let data = error.message;
       res.json({ isSuccess: false, data });
@@ -72,9 +72,9 @@ router.post("/login", async (req, res) => {
 
       const updatedUser = await user.save();
       // user
-      res.json(updatedUser);
+      res.json({ isSuccess: true, data: updatedUser.token });
     } else {
-      res.send("Email ou Password incorreta!");
+      res.json({ isSuccess: false, data: "Email ou Password incorreta!" });
     }
   } catch (err) {
     console.log(err);

@@ -6,6 +6,7 @@ const {
   GraphQLInt,
 } = require("graphql");
 
+//TYPES DEFAULT BY MONGOOSE MODEL
 const TagType = new GraphQLObjectType({
   name: "Tag",
   fields: () => ({
@@ -38,7 +39,7 @@ const WorkerType = new GraphQLObjectType({
     monthlysalary: { type: GraphQLInt },
     yearsofexperience: { type: GraphQLInt },
     yearsatcompany: { type: GraphQLInt },
-    tag: { type: TagType },
+    tag_id: { type: TagType },
   }),
 });
 
@@ -52,5 +53,33 @@ const OfficeType = new GraphQLObjectType({
   }),
 });
 
-exports.TagType = TagType;
+// SPECIAL TYPES
+const Empresa_countWorkersType = new GraphQLObjectType({
+  name: "Empresa_countWorkers",
+  fields: () => ({
+    companie: { type: GraphQLString },
+    TotalWorkers: { type: GraphQLInt },
+  }),
+});
+
+const Workers_EmpresaPorLocationType = new GraphQLObjectType({
+  name: "Workers_EmpresaPorLocation",
+  fields: () => ({
+    location: { type: GraphQLString },
+    empresas: {
+      type: new GraphQLList(Empresa_countWorkersType),
+    },
+  }),
+});
+
+const mediaSalario = new GraphQLObjectType({
+  name: "mediasalarioEmpresa",
+  fields: () => ({
+    companie: { type: GraphQLString },
+    media: { type: GraphQLString },
+    workers: { type: GraphQLInt },
+  }),
+});
+exports.Workers_EmpresaPorLocationType = Workers_EmpresaPorLocationType;
 exports.OfficeType = OfficeType;
+exports.mediaSalario = mediaSalario;

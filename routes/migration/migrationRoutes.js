@@ -66,7 +66,7 @@ router.get(
                   countInserted = 0;
                   totalToInsert = 0;
                   isLocked = false;
-
+                  console.log(error);
                   return res.json({
                     isSuccess: false,
                     data: "Erro na migração ao inserir Companie",
@@ -94,6 +94,7 @@ router.get(
                   countInserted = 0;
                   totalToInsert = 0;
                   isLocked = false;
+                  console.log(error);
 
                   return res.json({
                     isSuccess: false,
@@ -104,7 +105,7 @@ router.get(
               //trocar pela respetiva tag
               for (const singleWorker of workers) {
                 let insertedTag;
-
+                console.log(singleWorker.tag_id);
                 const tag = {
                   tag: singleWorker.tag_id,
                 };
@@ -123,19 +124,21 @@ router.get(
                     insertedTag = result;
                     countInserted = countInserted + 1;
                     // console.log(result);
+                    if (insertedTag) {
+                      singleWorker.tag_id = insertedTag._id;
+                    }
                   })
                   .catch((error) => {
                     countInserted = 0;
                     totalToInsert = 0;
                     isLocked = false;
+                    console.log(error);
 
                     return res.json({
                       isSuccess: false,
                       data: "Erro na migração ao inserir Tag",
                     });
                   });
-
-                singleWorker.tag_id = insertedTag._id;
               }
 
               const officeObject = {
@@ -167,20 +170,22 @@ router.get(
                   countInserted = 0;
                   totalToInsert = 0;
                   isLocked = false;
+                  console.log(error);
                   return res.json({
                     isSuccess: false,
                     data: "Erro na migração ao inserir Office",
                   });
                 });
             }
-          } catch {
+          } catch (error) {
             countInserted = 0;
             totalToInsert = 0;
             isLocked = false;
+            console.log(error);
 
             return res.json({
               isSuccess: false,
-              data: "Erro na migração ",
+              data: "Erro na migração",
             });
           }
         })
@@ -198,7 +203,7 @@ router.get(
     } else {
       return res.json({
         isSuccess: false,
-        data: `Já está a decorrer uma Importação! Espere até terminir a Importação atual.`,
+        data: `Já está a decorrer uma Importação! Espere até terminar a Importação atual.`,
       });
     }
   }

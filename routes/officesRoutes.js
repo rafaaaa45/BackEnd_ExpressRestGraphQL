@@ -4,8 +4,8 @@ const Office = require("../models/Offices");
 const Location = require("../models/Location");
 const Companie = require("../models/Companies");
 const Tag = require("../models/Tags");
-const utils = require("../utils/utils");
 const auth = require("../middleware/auth");
+const { count } = require("../models/Tags");
 
 router.get("/", auth.verifyToken, auth.verifyAny, async (req, res) => {
   const id = req.query.id;
@@ -298,5 +298,72 @@ router.delete(
       });
   }
 );
+
+router.get("/GetMedia", async (req, res) => {
+  let officesMediaSalary = [];
+  let companiesMediaSalary = [];
+  let Offices = await Office.find()
+    .populate("locationId")
+    .populate("companyId")
+    .populate("workers.tag_id");
+
+  Promise.all(
+    Offices.map((office) => {
+      let somaSalario = 0;
+      let totalWorkers = office.workers.length;
+      for (const worker of office.workers) {
+        somaSalario = somaSalario + worker.monthlysalary;
+      }
+
+      let media = somaSalario / totalWorkers;
+
+      const ObjectOffice = {
+        empresa: office.companyId.companie,
+        mediaSalario: media.toFixed(0),
+        totalWorkers: office.workers.length,
+      };
+
+      officesMediaSalary.push(ObjectOffice);
+    })
+  ).then(async () => {
+    for (const office of officesMediaSalary) {
+      let currentOffice;
+      currentOffice = office;
+      empresaName = office.empresa;
+      let somaSalario = 0;
+      let totalWorkers = 0;
+
+      if (empresaName === "facebook") {
+        console.log(companiesMediaSalary.includes(empresaName));
+      }
+      for (const officeMedia of officesMediaSalary) {
+        if (currentOffice.empresa === officeMedia.empresa) {
+          if (isNaN(officeMedia.mediaSalario)) {
+            somaSalario = somaSalario + 0;
+          } else {
+            somaSalario = somaSalario + parseInt(officeMedia.mediaSalario);
+            totalWorkers = totalWorkers + officeMedia.totalWorkers;
+          }
+        }
+      }
+
+      companiesMediaSalary = companiesMediaSalary.filter(
+        (e) => e.empresa !== empresaName
+      );
+
+      let media = somaSalario / totalWorkers;
+
+      const ObjectEmpresa = {
+        empresa: empresaName,
+        mediaSalario: media.toFixed(2),
+        totalFuncionarios: totalWorkers,
+      };
+
+      await companiesMediaSalary.push(ObjectEmpresa);
+    }
+
+    res.json({ data: companiesMediaSalary });
+  });
+});
 
 module.exports = router;
