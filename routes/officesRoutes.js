@@ -49,8 +49,6 @@ router.post(
     const companyId = req.body.companie;
     const workers = req.body.workers;
 
-    let location = await Location.findById(locationId);
-
     for (const worker of workers) {
       if (worker.tag !== "") {
         const tag = await Tag.findById(worker.tag_id);
@@ -76,6 +74,8 @@ router.post(
         }
       }
     }
+
+    let location = await Location.findById(locationId);
 
     if (location === null) {
       return res.json({
@@ -111,6 +111,9 @@ router.post(
         runValidators: true,
       }
     )
+      .populate("locationId")
+      .populate("companyId")
+      .populate("workers.tag_id")
       .then((result) => {
         // console.log(result);
         res.json({ isSuccess: true, data: result });
@@ -227,9 +230,35 @@ router.put(
   auth.verifyAdmin_Edit,
   async (req, res) => {
     const id = req.query.id;
-
     const locationId = req.body.location;
     const companyId = req.body.companie;
+    const workers = req.body.workers;
+
+    for (const worker of workers) {
+      if (worker.tag !== "") {
+        const tag = await Tag.findById(worker.tag_id);
+
+        if (tag === null) {
+          return res.json({
+            isSuccess: false,
+            data: "Não existe tag para o UUID " + worker.tag_id,
+          });
+        }
+      } else {
+        //se enviar o worker a null enviar erro
+        if (
+          !worker.totalyearlycompensation &&
+          !worker.monthlysalary &&
+          !worker.yearsofexperience &&
+          !worker.tag_id
+        ) {
+          return res.json({
+            isSuccess: false,
+            data: "Necessita de Adicionar os dados do Worker",
+          });
+        }
+      }
+    }
 
     let location = await Location.findById(locationId);
 
@@ -250,15 +279,27 @@ router.put(
     }
 
     const officeUpdated = {
-      _id: id,
       locationId: locationId,
       companyId: companyId,
     };
+
+    let officeVerificacao = await Office.find(officeUpdated);
+    //verificação se já existe algum office com a localização e company inseridas
+    if (officeVerificacao && officeVerificacao[0]._id !== id) {
+      return res.json({
+        isSuccess: false,
+        data:
+          "Não pode atualizar o office com o UUID " +
+          id +
+          " para um office já existente!",
+      });
+    }
 
     await Office.findOneAndUpdate(
       { _id: id },
       {
         $set: officeUpdated,
+        $push: { workers: workers },
       },
       {
         //Caso não exista id insere novo
@@ -267,6 +308,9 @@ router.put(
         runValidators: true,
       }
     )
+      .populate("locationId")
+      .populate("companyId")
+      .populate("workers.tag_id")
       .then((result) => {
         res.json({ isSuccess: true, data: result });
       })
