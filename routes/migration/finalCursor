@@ -70,15 +70,9 @@ i:= 0;
 		then exit;	
 		END IF;
 		close offices;	
-		
 		i:= i + 1;		
-		
 		return next offi;
-
 	END LOOP;		 
-     
-	
-
 END;
 $BODY$;
 
